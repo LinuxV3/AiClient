@@ -1,0 +1,1 @@
+{"ai": {"database_path": "storage/databases/main.db", "show_notif": "ON", "service_type": "g4f", "conversion_id": 1, "notif_type": "label", "theme": "light"}, "image_generator": {"nsfw_level": "medium", "service_type": "local", "model": "sdxl", "images_show_height": 512, "images_show_weight": 512, "theme": "light"}, "translator": {"theme": "light", "dest": "en", "src": "auto"}}

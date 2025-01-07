@@ -1,0 +1,843 @@
+{
+  "app_version": "0.1",
+  "config": {
+    "create": {
+      "folders": [
+        "storage",
+        "storage/json",
+        "storage/databases",
+        "storage/media"
+      ],
+      "files": {
+        "settings": "storage/json/settings.json",
+        "database": "storage/databases/main.db"
+      }
+    }
+  },
+  "config_version": "0.1",
+  "defaults": {
+    "database_file_name": "storage/databases/main.db",
+    "database_path": "storage/databases/main.db",
+    "settings_file_name": "storage/json/settings.json"
+  },
+  "format": {
+    "database": ".db"
+  },
+  "media": {
+    "configs": {"configs": "storage/json/configs.json"},
+    "service_type": {
+      "local": "storage/media/local.png",
+      "server": "storage/media/server.png",
+      "g4f": "storage/media/g4f.png"
+    },
+    "main_ui": {
+      "icon": "storage/media/main_icon.png"
+    },
+    "image_generator": {
+      "icon": "storage/media/image_generator_icon.png",
+      "welcome": "storage/media/welcome_image_generator.png",
+      "error": "storage/media/error.png"
+    },
+    "translator": {
+      "icon": "storage/media/translator_icon.png"
+    }
+  },
+  "models": {
+    "all": [
+      {
+        "id": "gpt-3",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "gpt-3.5-turbo",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "gpt-4",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "gpt-4-turbo",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "gpt-4o",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "gpt-4o-mini",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "o1-preview",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "o1-mini",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "meta-ai",
+        "owned_by": "Meta"
+      },
+      {
+        "id": "llama-2-7b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3-8b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3.1-8b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3.1-70b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3.1-405b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3.2-1b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3.2-11b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "llama-3.3-70b",
+        "owned_by": "Meta Llama"
+      },
+      {
+        "id": "mixtral-7b",
+        "owned_by": "Mistral"
+      },
+      {
+        "id": "mixtral-8x7b",
+        "owned_by": "Mistral"
+      },
+      {
+        "id": "mistral-nemo",
+        "owned_by": "Mistral"
+      },
+      {
+        "id": "mistral-large",
+        "owned_by": "Mistral"
+      },
+      {
+        "id": "hermes-2-dpo",
+        "owned_by": "NousResearch"
+      },
+      {
+        "id": "hermes-2-pro",
+        "owned_by": "NousResearch"
+      },
+      {
+        "id": "hermes-3",
+        "owned_by": "NousResearch"
+      },
+      {
+        "id": "phi-2",
+        "owned_by": "Microsoft"
+      },
+      {
+        "id": "phi-3.5-mini",
+        "owned_by": "Microsoft"
+      },
+      {
+        "id": "gemini",
+        "owned_by": "Google DeepMind"
+      },
+      {
+        "id": "gemini-pro",
+        "owned_by": "Google DeepMind"
+      },
+      {
+        "id": "gemini-flash",
+        "owned_by": "Google DeepMind"
+      },
+      {
+        "id": "gemma-2b",
+        "owned_by": "Google"
+      },
+      {
+        "id": "claude-3-opus",
+        "owned_by": "Anthropic"
+      },
+      {
+        "id": "claude-3-sonnet",
+        "owned_by": "Anthropic"
+      },
+      {
+        "id": "claude-3-haiku",
+        "owned_by": "Anthropic"
+      },
+      {
+        "id": "claude-3.5-sonnet",
+        "owned_by": "Anthropic"
+      },
+      {
+        "id": "reka-core",
+        "owned_by": "Reka AI"
+      },
+      {
+        "id": "blackboxai",
+        "owned_by": "Blackbox AI"
+      },
+      {
+        "id": "blackboxai-pro",
+        "owned_by": "Blackbox AI"
+      },
+      {
+        "id": "command-r-plus",
+        "owned_by": "CohereForAI"
+      },
+      {
+        "id": "command-r",
+        "owned_by": "CohereForAI"
+      },
+      {
+        "id": "GigaChat:latest",
+        "owned_by": "gigachat"
+      },
+      {
+        "id": "qwen-1.5-7b",
+        "owned_by": "Qwen"
+      },
+      {
+        "id": "qwen-2-72b",
+        "owned_by": "Qwen"
+      },
+      {
+        "id": "qwen-2.5-72b",
+        "owned_by": "Qwen"
+      },
+      {
+        "id": "qwen-2.5-coder-32b",
+        "owned_by": "Qwen"
+      },
+      {
+        "id": "qwq-32b",
+        "owned_by": "Qwen"
+      },
+      {
+        "id": "pi",
+        "owned_by": "Inflection"
+      },
+      {
+        "id": "wizardlm-2-8x22b",
+        "owned_by": "WizardLM"
+      },
+      {
+        "id": "openchat-3.5",
+        "owned_by": "OpenChat"
+      },
+      {
+        "id": "grok-beta",
+        "owned_by": "x.ai"
+      },
+      {
+        "id": "sonar-online",
+        "owned_by": "Perplexity AI"
+      },
+      {
+        "id": "sonar-chat",
+        "owned_by": "Perplexity AI"
+      },
+      {
+        "id": "deepseek-chat",
+        "owned_by": "DeepSeek"
+      },
+      {
+        "id": "deepseek-coder",
+        "owned_by": "DeepSeek"
+      },
+      {
+        "id": "german-7b",
+        "owned_by": "DiscoResearch"
+      },
+      {
+        "id": "nemotron-70b",
+        "owned_by": "Nvidia"
+      },
+      {
+        "id": "openhermes-2.5",
+        "owned_by": "Teknium"
+      },
+      {
+        "id": "lfm-40b",
+        "owned_by": "Liquid"
+      },
+      {
+        "id": "zephyr-7b",
+        "owned_by": "HuggingFaceH4"
+      },
+      {
+        "id": "neural-7b",
+        "owned_by": "Inferless"
+      },
+      {
+        "id": "dbrx-instruct",
+        "owned_by": "Databricks"
+      },
+      {
+        "id": "p1",
+        "owned_by": "PollinationsAI"
+      },
+      {
+        "id": "evil",
+        "owned_by": "Evil Mode - Experimental"
+      },
+      {
+        "id": "midijourney",
+        "owned_by": "Other"
+      },
+      {
+        "id": "turbo",
+        "owned_by": "Other"
+      },
+      {
+        "id": "unity",
+        "owned_by": "Other"
+      },
+      {
+        "id": "rtist",
+        "owned_by": "Other"
+      },
+      {
+        "id": "sdxl",
+        "owned_by": "Stability AI"
+      },
+      {
+        "id": "sd-3",
+        "owned_by": "Stability AI"
+      },
+      {
+        "id": "playground-v2.5",
+        "owned_by": "Playground AI"
+      },
+      {
+        "id": "flux",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-pro",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-dev",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-realism",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-cablyai",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-anime",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-3d",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-disney",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-pixel",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "flux-4o",
+        "owned_by": "Flux AI"
+      },
+      {
+        "id": "dall-e-3",
+        "owned_by": "OpenAI"
+      },
+      {
+        "id": "midjourney",
+        "owned_by": "Midjourney"
+      },
+      {
+        "id": "any-dark",
+        "owned_by": "Other"
+      }
+    ],
+    "available": {
+      "g4f": {
+        "image": [
+          {
+            "id": "sdxl",
+            "owned_by": "Stability AI"
+          },
+          {
+            "id": "sd-3",
+            "owned_by": "Stability AI"
+          },
+          {
+            "id": "playground-v2.5",
+            "owned_by": "Playground AI"
+          },
+          {
+            "id": "flux",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-pro",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-realism",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-cablyai",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-anime",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-3d",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-disney",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-pixel",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-4o",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "dall-e-3",
+            "owned_by": "OpenAI"
+          },
+          {
+            "id": "midjourney",
+            "owned_by": "Midjourney"
+          },
+          {
+            "id": "any-dark",
+            "owned_by": "Other"
+          }
+        ],
+        "text": {
+          "selenium": [
+            {
+              "id": "llama-2-7b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3-8b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.1-8b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.1-70b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.1-405b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.2-1b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.2-11b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.3-70b",
+              "owned_by": "Meta Llama"
+            }
+          ],
+          "casual": [
+            {
+              "id": "gpt-3",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-3.5-turbo",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4o",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4o-mini",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4o-turbo",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "mixtral-7b",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mixtral-8x7b",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mistral-large",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "hermes-2-dpo",
+              "owned_by": "NousResearch"
+            },
+            {
+              "id": "gemini-pro",
+              "owned_by": "Google DeepMind"
+            },
+            {
+              "id": "gemini-flash",
+              "owned_by": "Google DeepMind"
+            },
+            {
+              "id": "gemma-2b",
+              "owned_by": "Google"
+            },
+            {
+              "id": "claude-3-haiku",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "claude-3.5-sonnet",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "blackboxai",
+              "owned_by": "Blackbox AI"
+            },
+            {
+              "id": "qwq-32b",
+              "owned_by": "Qwen"
+            },
+            {
+              "id": "pi",
+              "owned_by": "Inflection"
+            },
+            {
+              "id": "deepseek-chat",
+              "owned_by": "DeepSeek"
+            },
+            {
+              "id": "dbrx-instruct",
+              "owned_by": "Databricks"
+            },
+            {
+              "id": "midijourney",
+              "owned_by": "Other"
+            },
+            {
+              "id": "unity",
+              "owned_by": "Other"
+            },
+            {
+              "id": "rtist",
+              "owned_by": "Other"
+            }
+          ]
+        }
+      },
+      "local": {
+        "image": [
+          {
+            "id": "sdxl",
+            "owned_by": "Stability AI"
+          },
+          {
+            "id": "sd-3",
+            "owned_by": "Stability AI"
+          },
+          {
+            "id": "playground-v2.5",
+            "owned_by": "Playground AI"
+          },
+          {
+            "id": "flux",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-pro",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-realism",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-cablyai",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-anime",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-3d",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-disney",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-pixel",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "flux-4o",
+            "owned_by": "Flux AI"
+          },
+          {
+            "id": "dall-e-3",
+            "owned_by": "OpenAI"
+          },
+          {
+            "id": "midjourney",
+            "owned_by": "Midjourney"
+          },
+          {
+            "id": "any-dark",
+            "owned_by": "Other"
+          }
+        ],
+        "text": {
+          "selenium": [
+            {
+              "id": "llama-2-7b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3-8b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.1-8b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.1-70b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.1-405b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.2-1b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.2-11b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "llama-3.3-70b",
+              "owned_by": "Meta Llama"
+            },
+            {
+              "id": "mixtral-7b",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mixtral-8x7b",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mistral-nemo",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mistral-large",
+              "owned_by": "Mistral"
+            }
+          ],
+          "casual": [
+            {
+              "id": "gpt-3",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-3.5-turbo",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4o",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4o-mini",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "gpt-4o-turbo",
+              "owned_by": "OpenAI"
+            },
+            {
+              "id": "mixtral-7b",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mixtral-8x7b",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "mistral-large",
+              "owned_by": "Mistral"
+            },
+            {
+              "id": "hermes-2-dpo",
+              "owned_by": "NousResearch"
+            },
+            {
+              "id": "hermes-2-pro",
+              "owned_by": "NousResearch"
+            },
+            {
+              "id": "gemini-pro",
+              "owned_by": "Google DeepMind"
+            },
+            {
+              "id": "gemini-flash",
+              "owned_by": "Google DeepMind"
+            },
+            {
+              "id": "gemma-2b",
+              "owned_by": "Google"
+            },
+            {
+              "id": "claude-3-haiku",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "claude-3.5-sonnet",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "gemini-pro",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "gemini-flash",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "gemma-2b",
+              "owned_by": "Anthropic"
+            },
+            {
+              "id": "blackboxai",
+              "owned_by": "Blackbox AI"
+            },
+            {
+              "id": "qwq-32b",
+              "owned_by": "Qwen"
+            },
+            {
+              "id": "pi",
+              "owned_by": "Inflection"
+            },
+            {
+              "id": "deepseek-chat",
+              "owned_by": "DeepSeek"
+            },
+            {
+              "id": "dbrx-instruct",
+              "owned_by": "Databricks"
+            },
+            {
+              "id": "midijourney",
+              "owned_by": "Other"
+            },
+            {
+              "id": "unity",
+              "owned_by": "Other"
+            },
+            {
+              "id": "rtist",
+              "owned_by": "Other"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "path": {
+    "database": "storage/databases/",
+    "configs_file": "storage/json/configs.json"
+  },
+  "status_codes": {
+    "200": "Success! Your request was processed successfully.",
+    "201": "Created! Your resource has been created successfully.",
+    "204": "No Content! The request was successful, but there is no content to display.",
+    "301": "Moved Permanently! The resource has been moved to a new URL.",
+    "302": "Found! The resource is temporarily located at a different URL.",
+    "400": "Bad Request! There was an error with your request. Please check your input.",
+    "401": "Unauthorized! You need to log in to access this resource.",
+    "403": "Forbidden! You do not have permission to access this resource.",
+    "404": "Not Found! The resource you are looking for could not be found.",
+    "405": "Method Not Allowed! The request method is not supported for this resource.",
+    "408": "Request Timeout! Your request took too long to process. Please try again.",
+    "409": "Conflict! There was a conflict with your request. Please resolve it and try again.",
+    "410": "Gone! The resource you are looking for is no longer available.",
+    "500": "Internal Server Error! Something went wrong on our end. Please try again later.",
+    "502": "Bad Gateway! The server received an invalid response from the upstream server.",
+    "503": "Service Unavailable! The server is currently unable to handle your request. Please try again later.",
+    "504": "Gateway Timeout! The server took too long to respond. Please try again."
+  },
+  "settings": {
+                "ai":
+                      {
+                        "database_path": "storage/databases/main.db", "show_notif": "ON", "service_type": "g4f", "conversion_id": 1, "notif_type": "label", "theme": "light"
+                      },
+                "image_generator":
+                      {
+                        "nsfw_level": "medium", "service_type": "local", "model": "sdxl", "images_show_height": 512, "images_show_weight": 512, "theme": "light"
+                      },
+                "translator":
+                      {
+                        "theme": "light", "dest": "en", "src": "auto"
+                      }
+              },
+  "develop":
+              {
+                "Developer": "Abolfazl Eskandari",
+                "about_developer": "Hello! I’m Abolfazl Eskandari, a passionate programmer, tech enthusiast, and dedicated Linux fan. My journey into the world of programming began in the 7th grade when I first discovered Python. Since then, I’ve immersed myself in various Python libraries, including Tkinter for GUI development, Socket for networking, and Requests for handling HTTP requests.\n\nAs my curiosity grew, I ventured into mobile app development and learned the Kivy framework to create Android applications. I also explored PHP to develop APIs and web services, which further deepened my understanding of backend development. Recognizing the power of Python in web development, I embraced the Flask framework to build robust APIs and design dynamic websites.\n\nMy most recent project, AiClient, required me to dive into PyQt5, expanding my skill set even further. Throughout this journey, I realized that Windows has its limitations for programming, which led me to explore Linux. I started with Kali Linux, then transitioned to Ubuntu and Debian, ultimately finding my favorite: Mint Linux. I appreciate Mint for its user-friendly interface and ease of installing and using various development tools.\n\nI’m always eager to learn and grow in the ever-evolving tech landscape, and I look forward to connecting with fellow enthusiasts and collaborating on exciting projects!\n",
+                "website": "https://eskandariabolfazl1389.pythonanywhere.com/",
+                "app_website": "https://google.com/"
+              }
+}
