@@ -826,7 +826,7 @@
                       },
                 "image_generator":
                       {
-                        "nsfw_level": "medium", "service_type": "local", "model": "sdxl", "images_show_height": 512, "images_show_weight": 512, "theme": "light"
+                        "nsfw_level": "medium", "service_type": "local", "model": "sdxl", "images_show_height": 512, "images_show_width": 512, "theme": "light"
                       },
                 "translator":
                       {
