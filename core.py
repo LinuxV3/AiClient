@@ -7,15 +7,13 @@ import urllib.parse
 from json import load, dumps
 import sqlite3, os, sys
 from threading import Thread
+import logging
 
 
 def request__(method, url, **kwargs) -> Any:
-    print(f"Try send request to {url}")
+    log(f"Try send request to {url}", "debug")
     response = request_api(method, url)
-    try:
-        print(f"Response json: {response.json()}")
-    except json.decoder.JSONDecodeError:
-        print("Response text received.")
+    log(f"Request sent with {response.status_code} status code", "debug")
     return response
 
 
@@ -26,6 +24,8 @@ def get_file_url(file_name):
 built_databases = []
 server_url = 'http://aiclient.pythonanywhere.com/'
 configs_file_path = "storage/json/configs.json"
+logger = logging.getLogger("Core")
+logger.setLevel(logging.DEBUG)
 
 """
 def get_configs(slices):
@@ -73,7 +73,7 @@ def make_db(name: str=None):
 
 
 def store_settings(settings):
-    print("storing settings")
+    log("storing settings", 'debug')
     configs = read_configs()
     settings_file_name = configs['defaults']['settings_file_name']
     with open(settings_file_name, 'wt') as file:
@@ -81,7 +81,7 @@ def store_settings(settings):
 
 
 def read_settings():
-    print("reading settings")
+    log("reading settings", "debug")
     configs = read_configs()
     settings_file_name = configs['defaults']['settings_file_name']
     default_settings = configs['settings']
@@ -89,7 +89,6 @@ def read_settings():
         with open(settings_file_name, 'rt') as file:
             return load(file)
     except:
-        print(default_settings)
         store_settings(default_settings)
         return default_settings
 
@@ -400,7 +399,7 @@ class AiClient:
                 log_file.write(f"Stopped running API Server on localhost...")
         except Exception as error:
             sys.stdout = self.original_stdout
-            print(f"An error: {error}")
+            log(f"An error: {error}", "error")
         finally:
             sys.stdout = self.original_stdout
 
@@ -416,12 +415,11 @@ class AiClient:
         else:
             response = self.request_to_api(prompt)
         if not response[0]: # response is a tuple of (is_success, response)
-            print("return for unsuccessful response")
             return response
         self.record_messages_in_db(prompt, role=self.username)
-        print(f"Message from {self.username} recorded.")
+        log(f"Message from {self.username} recorded.", 'debug')
         self.record_messages_in_db(response[1], role=self.model)
-        print(f"Message from {self.model} recorded.")
+        log(f"Message from {self.model} recorded.", 'debug')
         return response
 
     def request_to_local(self, prompt):
@@ -520,12 +518,15 @@ def list_media():
 
 
 def log(dest: str, log_type='INFO'):
-    """
-    I chose to use this small and optimized function instead of the logging library
-    This function is just for debug
-    Log types: INFO, Warn, Error
-    """
-    print(f"[{log_type.upper()}] -> {dest}")
+    log_type = log_type.lower()
+    if log_type == 'info':
+        logger.info(dest)
+    elif log_type == 'warn':
+        logger.warning(dest)
+    elif log_type == 'error':
+        logger.error(dest)
+    else:
+        logger.debug(dest)
 
 
 def get_model_info(database: DB, **kwargs):
