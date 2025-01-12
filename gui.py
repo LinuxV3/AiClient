@@ -132,10 +132,8 @@ class GUI:
 
     def open_settings(self):
         try:
-            print("Opening settings dialog")
             self.settings_app = SettingsApp()
             self.settings_app.show()
-            print("Settings dialog opened")
         except Exception as e:
             QMessageBox.critical(self.main_window, "Error in settings", str(e))
 
@@ -380,7 +378,6 @@ class GUI:
         self.core_objects['client'].conversion_id = self.current_conversion_id
 
         # Create and start the thread
-        print(f"service_type: {self.service_type}, prompt: {prompt}")
         self.ai_client_thread = AiClientThread(self.core_objects['client'], prompt)
         self.ai_client_thread.task_completed.connect(self.on_task_completed)
         self.ai_client_thread.start()
@@ -392,7 +389,6 @@ class GUI:
             return
 
         is_first_message = len(self.conversion_messages) == 0
-        print(is_first_message, len(self.conversion_messages))
         if is_first_message:  # update and set conversion title if it's the first message in conversion
             title = self.temp_prompt
             if len(title) > 15:
@@ -405,7 +401,7 @@ class GUI:
             self._translate("main_window", "<font color='blue'>Agent is waiting for task...</font>"))
 
     def show_notif(self, message, during=3, color: str = 'blue', font=None):
-        print(f"NOTIF: {message}")
+        core.log(f"NOTIF: {message}", 'debug')
         settings = core.read_settings()['ai']
         if settings['show_notif'] == "OFF":
             return
@@ -470,8 +466,6 @@ class GUI:
             self.chats_buttons.append(chat)
 
     def load_conversion_messages(self, conversion_id):
-        print(f"Loading messages for conversion ID: {conversion_id}")  # Debugging line
-
         # Clear existing messages
         while self.messages_layout.count():  # While there are items in the layout
             item = self.messages_layout.takeAt(0)  # Take the first item
@@ -481,8 +475,6 @@ class GUI:
         self.current_conversion_id = int(conversion_id)
         self.conversion_messages = self.core_objects['client'].database.get_conversion_messages(
             self.current_conversion_id)
-
-        print(f"Retrieved messages: {self.conversion_messages}")  # Debugging line
 
         # Check if messages were retrieved
         if not self.conversion_messages:
@@ -510,7 +502,6 @@ class GUI:
         self.scroll_area.update()
 
     def change_service_type(self, new_service_type_index):
-        print("service type index:", new_service_type_index)
         self.service_type = self.service_types[int(new_service_type_index)].lower()
         settings = core.read_settings()
         settings['ai']['service_type'] = self.service_type

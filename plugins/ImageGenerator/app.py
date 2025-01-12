@@ -32,7 +32,6 @@ class OneArgThread(QThread):
         self.app_self.is_thread_did = False
     def run(self):
         result = self.func(self.arg)
-        print(f"Func {self.func.__name__} result: {result}")
         self.app_self.thread_result = result
         self.app_self.is_thread_did = True
 
@@ -47,7 +46,6 @@ class TwoArgThread(QThread):
         self.app_self.is_thread_did = False
     def run(self):
         result = self.func(self.arg1, self.arg2)
-        print(f"Func {self.func.__name__} result: {result}")
         self.app_self.thread_result = result
         self.app_self.is_thread_did = True
 
@@ -71,7 +69,7 @@ class SettingsApp(QMainWindow):
         self.nsfw_label = QLabel('NSFW Level:')
         self.nsfw_combo = QComboBox()
         self.nsfw_combo.addItems(['Low', 'Medium', 'High'])
-        print(f"NSFW will set to {settings['nsfw_level']}")
+        core.log(f"NSFW will set to {settings['nsfw_level']}", 'info')
 
         # Image Width TextEdit
         self.width_label = QLabel('Image Show Width:')
@@ -146,7 +144,7 @@ def check_nsfw(text, level):
 
 def generate_image(prompt, service_type, model):
     response = generate_image_(prompt=prompt, model=model, service_type=service_type)
-    print(response)
+    core.log(f"Response in generate image: {response}", 'info')
     status = response[0]
     if status:
         images = []
@@ -163,9 +161,8 @@ def generate_image(prompt, service_type, model):
                         isok = True
                     else:
                         isok = False
-                        print(f"status code is {response.status_code}")
+                        core.log(f"status code is {response.status_code}", 'debug')
                 except Exception as e:
-                    print(e)
                     isok = False
                 if not isok:
                     try:
@@ -309,7 +306,6 @@ class ImageGeneratorApp(QMainWindow):
         if isinstance(self.model, dict): # if self.model is a dict of {'id': 'model_name', 'owned_by': 'model_owner'}
             self.model = self.model['id']
         self.models = core.read_configs()['models']['available'][self.service_type]['image']
-        print("service_type:", self.service_type, "model:", self.model)
         super().__init__()
         self.initUI()
 
@@ -321,7 +317,6 @@ class ImageGeneratorApp(QMainWindow):
             func = QMessageBox.information
         elif not is_success:
             func = QMessageBox.critical
-        print(is_success, func, show_success)
         if func:
             func(self, "Connection status", msg)
         return is_success

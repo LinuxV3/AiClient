@@ -22,7 +22,6 @@ class TranslatorApp:
         self.current_theme = self.settings['theme']
         self.src_lang = self.settings['src']
         self.dest_lang = self.settings['dest']
-        print(f"Theme:{self.current_theme},src:{self.src_lang},dest:{self.dest_lang}")
         self.light_theme = """
             QMainWindow, QWidget {
                 background-color: #ffffff;
@@ -105,24 +104,22 @@ class TranslatorApp:
         self.save_settings()
 
     def change_src_lang(self, new_src_lang):
-        print(f"src_lang changed to {new_src_lang}")
         self.src_lang = TranslatorApp.find_key_by_value(self.languages, new_src_lang)
         self.save_settings()
-        print(f"src_lang set to {self.src_lang}")
+        core.log(f"src_lang set to {self.src_lang}")
 
     def change_dest_lang(self, new_dest_lang):
-        print(f"dest_lang changed to {new_dest_lang}")
         self.dest_lang = TranslatorApp.find_key_by_value(self.languages, new_dest_lang)
         self.save_settings()
-        print(f"dest_lang set to {self.dest_lang}")
+        core.log(f"dest_lang set to {self.dest_lang}")
 
     @staticmethod
     def find_key_by_value(dictionary: dict, value: Any):
-        print(f"find_key_by_value for {value}")
+        core.log(f"find_key_by_value for {value}", 'debug')
         for key, val in dictionary.items():
             if val == value:
                 return key
-        print("Key not found")
+        core.log("Key not found", 'error')
 
     def save_settings(self):
         self.settings = core.read_settings()
@@ -132,7 +129,7 @@ class TranslatorApp:
         core.store_settings(self.settings)
         self.src_lang = self.settings['translator']['src']
         self.dest_lang = self.settings['translator']['dest']
-        print(f"Settings -> src:{self.src_lang},dest:{self.dest_lang},theme:{self.current_theme}")
+        core.log(f"Settings -> src:{self.src_lang},dest:{self.dest_lang},theme:{self.current_theme}", 'debug')
 
     # Method to set up the UI components
     def setupUi(self, TranslatorWindow):
