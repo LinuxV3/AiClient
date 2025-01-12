@@ -62,7 +62,7 @@ class GUI:
     chats = []
     chats_buttons = []
     conversion_messages = []
-    service_types = ['Local', 'G4f', 'Server']
+    service_types = ['Local', 'G4f']
     messages_pov = (5, 5, 445, 20)
     dark_theme = """
         QMainWindow, QWidget {
@@ -204,7 +204,6 @@ class GUI:
         self.messages_widget.setLayout(self.messages_layout)
         self.scroll_area.setWidget(self.messages_widget)
         self.chat_layout.addWidget(self.scroll_area)  # Assuming self.chat_layout is part of self.main_layout
-
 
         size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         size_policy.setHorizontalStretch(0)
