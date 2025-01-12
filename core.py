@@ -5,7 +5,8 @@ from g4f import Client as G4fClient
 from g4f.api import run_api
 import urllib.parse
 from json import load, dumps
-import sqlite3, os
+import sqlite3, os, sys
+from threading import Thread
 
 
 def request__(method, url, **kwargs) -> Any:
@@ -336,7 +337,7 @@ class AiClient:
     base_url = None
     local_api_status = False # False means isn't running and True means local api server is running.
 
-    def init(self, conversion_id: int | str=None, database_path: str=None, model: str=None, base_url: str=None, service_type: str='g4f', conversion: list=[], model_id: int=None, username='user'):
+    def init(self, ignore_database: bool=False, conversion_id: int | str=None, database_path: str=None, model: str=None, base_url: str=None, service_type: str='g4f', conversion: list=[], model_id: int=None, username='user'):
         log(f"Using {self.service} service")
         self.username = username
         self.database_path = database_path
@@ -346,20 +347,22 @@ class AiClient:
         self.service_type = service_type
         self.base_url = base_url
         self.configs = read_configs()
-        if not self.database_path:
-            self.database_path = get_main_database_path()
-        self.database = DB(self.database_path)
-        conversion_info = None
-        if self.conversion_id:
-            conversion_info = self.database.get_conversion(self.conversion_id)[0]
+        self.ignore_database = ignore_database
         self.model_id = model_id
-        if not self.base_url:
-            if not self.model_id and conversion_info:
-                self.model_id = int(conversion_info['model_id'])
-            if not self.model and self.model_id:
-                self.model = self.database.get_model(self.model_id)[0]['name']
-            if not self.model and self.service_type == 'g4f':
-                self.model = 'gpt-4o-mini'
+        conversion_info = None
+        if not self.ignore_database:
+            if not self.database_path:
+                self.database_path = get_main_database_path()
+            self.database = DB(self.database_path)
+            if self.conversion_id:
+                conversion_info = self.database.get_conversion(self.conversion_id)[0]
+            if not self.base_url:
+                if not self.model_id and conversion_info:
+                    self.model_id = int(conversion_info['model_id'])
+                if not self.model and self.model_id:
+                    self.model = self.database.get_model(self.model_id)[0]['name']
+                if not self.model and self.service_type == 'g4f':
+                    self.model = 'gpt-4o-mini'
         self.client = G4fClient()
         log(f"Successfully init.")
 
@@ -373,22 +376,43 @@ class AiClient:
         self.conversion_id = None
         self.database_path = None
         self.username = None
+        self.original_stdout = sys.stdout
         log("AiClient object created.")
 
     def record_messages_in_db(self, message, role):
-        return self.database.record_message(message=message, conversion_id=self.conversion_id, role=role)
+        if not self.ignore_database:
+            return self.database.record_message(message=message, conversion_id=self.conversion_id, role=role)
+
+    def run_local_api_server_(self):
+        log_file_name = 'local_api_status.txt'
+        try:
+            try:
+                os.remove(log_file_name)
+            except:
+                pass
+            with open(log_file_name, 'wt') as f:
+                f.write("Start Running API Server on localhost...")
+                sys.stdout = f
+                self.local_api_status = True
+                run_api() # docs: https://g4f.mintlify.app/docs/core/usage/inference
+        except KeyboardInterrupt:
+            with open(log_file_name, 'at') as log_file:
+                log_file.write(f"Stopped running API Server on localhost...")
+        except Exception as error:
+            sys.stdout = self.original_stdout
+            print(f"An error: {error}")
+        finally:
+            sys.stdout = self.original_stdout
 
     def run_local_api_server(self):
-        run_api() # docs: https://g4f.mintlify.app/docs/core/usage/inference
-        self.local_api_status = True
+        self.local_api_thread = Thread(target=self.run_local_api_server_)
+        self.local_api_thread.start()
 
     def ask(self, prompt):
         if self.service_type == 'g4f': # using g4f api server
             response = self.ask_g4f(prompt)
         elif self.service_type == 'local' and self.base_url:
             response = self.request_to_local(prompt) # using g4f api on localhost, api server on local will run by run_local_api_server function
-        elif self.service_type == 'server' and self.base_url:
-            response = self.request_to_api(prompt) # sending request to a custom server (will add in database by user)
         else:
             response = self.request_to_api(prompt)
         if not response[0]: # response is a tuple of (is_success, response)
