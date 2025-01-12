@@ -191,7 +191,7 @@ def find_image_urls(response):
 
 def check_network(timeout_time=None):
     ping_url = "http://google.com/"
-    dns_problem_url = "8.8.8.8"
+    dns_problem_url = "http://8.8.8.8"
     default_timeout = 5
 
     if not timeout_time:
