@@ -29,9 +29,12 @@ class OneArgThread(QThread):
         self.arg = arg
         self.func = func
         self.app_self = app_self
+        self.app_self.is_thread_did = False
     def run(self):
         result = self.func(self.arg)
+        print(f"Func {self.func.__name__} result: {result}")
         self.app_self.thread_result = result
+        self.app_self.is_thread_did = True
 
 
 class TwoArgThread(QThread):
@@ -41,9 +44,12 @@ class TwoArgThread(QThread):
         self.arg2 = arg2
         self.func = func
         self.app_self = app_self
+        self.app_self.is_thread_did = False
     def run(self):
         result = self.func(self.arg1, self.arg2)
+        print(f"Func {self.func.__name__} result: {result}")
         self.app_self.thread_result = result
+        self.app_self.is_thread_did = True
 
 
 class SettingsApp(QMainWindow):
@@ -52,6 +58,7 @@ class SettingsApp(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        settings = core.read_settings()['image_generator']
         self.setWindowTitle('Settings App')
         self.setGeometry(100, 100, 300, 200)
 
@@ -64,16 +71,19 @@ class SettingsApp(QMainWindow):
         self.nsfw_label = QLabel('NSFW Level:')
         self.nsfw_combo = QComboBox()
         self.nsfw_combo.addItems(['Low', 'Medium', 'High'])
+        print(f"NSFW will set to {settings['nsfw_level']}")
 
         # Image Width TextEdit
         self.width_label = QLabel('Image Show Width:')
         self.width_edit = QTextEdit()
         self.width_edit.setFixedHeight(30)
+        self.width_edit.insertPlainText(str(settings['images_show_width']))
 
         # Image Height TextEdit
         self.height_label = QLabel('Image Show Height:')
         self.height_edit = QTextEdit()
         self.height_edit.setFixedHeight(30)
+        self.height_edit.insertPlainText(str(settings['images_show_height']))
 
         # Save Button
         self.save_button = QPushButton('Save Settings')
@@ -87,6 +97,7 @@ class SettingsApp(QMainWindow):
         layout.addWidget(self.height_label)
         layout.addWidget(self.height_edit)
         layout.addWidget(self.save_button)
+        self.nsfw_combo.setCurrentText(settings['nsfw_level'].capitalize())
 
     def save_settings(self):
         try:
@@ -99,16 +110,16 @@ class SettingsApp(QMainWindow):
             if width <= 0 or height <= 0:
                 raise ValueError("Width and Height must be greater than 0.")
             settings = core.read_settings()
-            settings['image_generator']['nsfw_level'] = nsfw_level
-            settings['image_generator']['width'] = width
-            settings['image_generator']['height'] = height
+            settings['image_generator']['nsfw_level'] = nsfw_level.lower()
+            settings['image_generator']['images_show_width'] = width
+            settings['image_generator']['images_show_height'] = height
             core.store_settings(settings)
-            QMessageBox.information(self, 'Settings Saved')
+            QMessageBox.information(self, "success", 'Settings Saved')
         except ValueError as e:
             QMessageBox.warning(self, 'Input Error',
                                 str(e) + "\nPlease enter valid values.")
         except Exception as e:
-            QMessageBox.warning(self, f'Error Occurred\n{e}')
+            QMessageBox.warning(self, "Error", f'Error Occurred\n{e}')
 
 
 def get_error_message_image():
@@ -152,7 +163,9 @@ def generate_image(prompt, service_type, model):
                         isok = True
                     else:
                         isok = False
-                except:
+                        print(f"status code is {response.status_code}")
+                except Exception as e:
+                    print(e)
                     isok = False
                 if not isok:
                     try:
@@ -177,9 +190,9 @@ def find_image_urls(response):
 
 
 def check_network(timeout_time=None):
-    ping_url = "https://google.com/"
-    dns_problem_url = "http://8.8.8.8"
-    default_timeout = 2
+    ping_url = "http://google.com/"
+    dns_problem_url = "8.8.8.8"
+    default_timeout = 5
 
     if not timeout_time:
         timeout_time = default_timeout
@@ -204,50 +217,21 @@ def check_network(timeout_time=None):
 
 
 def generate_image_(service_type, prompt, model):
-    local_api_url = "http://localhost:1337/v1/chat/completions"
-    local_api_ping_url = "http://localhost:1337/"
-    server_api_url = "http://aiclient.pythonanywhere.com/v1/chat/completions"
-    params = {}
-    if service_type == 'server':
-        api_url = server_api_url
-        try:
-            response = requests.get(api_url).json()['choices'][0]['message']['content']
-            if response.status_code != 200:
-                return [False, f"Error: Received status code {response.status_code}"]
-        except Exception as e:
-            return [False, f"Error: {e}"]
-    elif service_type == 'local':
-        api_url = local_api_url
-        try:
-            local_server_status = True
-            try:
-                status = requests.get(local_api_ping_url).status_code
-                if status != 200:
-                    raise ValueError("Local api server isn`t running!")
-            except Exception as e:
-                local_server_status = False
-                error_text = str(e)
-            if local_server_status:
-                response = requests.get(api_url).json()['choices'][0]['message']['content']
-                if response.status_code != 200:
-                    return [False, f"Error: Received status code {response.status_code}"]
-            else:
-                return [False, error_text]
-        except Exception as e:
-            return [False, f"Error: {e}"]
-    elif service_type == 'g4f':
-        try:
-            client = g4f_client()
-            response = client.chat.completions.create(model=model, messages=[{'role': 'user', 'content': prompt}])
-            response = response.choices[0].message.content
-        except Exception as e:
-            return [False, f"Error: {e}"]
-
-    return [True, find_image_urls(response)]
+    client = core.AiClient()
+    client.init(ignore_database=True, model=model, service_type=service_type)
+    try:
+        response = client.ask(prompt=prompt)
+    except Exception as e:
+        return [False, str(e)]
+    else:
+        if response[0]:
+            return [True, find_image_urls(response[1])]
+        else:
+            return response
 
 
 class ImageGeneratorApp(QMainWindow):
-    service_types = ['server', 'local', 'g4f']
+    service_types = ['local', 'g4f']
     is_first_try = True
     is_display_size_info = True
     light_theme = """
@@ -314,8 +298,8 @@ class ImageGeneratorApp(QMainWindow):
     """
 
     def open_settings(self):
-        app = SettingsApp()
-        app.show()
+        self.settings_app = SettingsApp()
+        self.settings_app.show()
 
     def __init__(self):
         self.settings = core.read_settings()['image_generator']
@@ -488,7 +472,7 @@ class ImageGeneratorApp(QMainWindow):
             qimage = QImage(data, image.width , image.height, QImage.Format_RGBA8888)
             pixmap = QPixmap.fromImage(qimage)
             
-            desired_width = self.settings['images_show_weight']
+            desired_width = self.settings['images_show_width']
             desired_height = self.settings['images_show_height']
             pixmap = pixmap.scaled(desired_width, desired_height, aspectRatioMode=Qt.KeepAspectRatio)  
             self.image_label.setPixmap(pixmap)  
@@ -509,18 +493,14 @@ class ImageGeneratorApp(QMainWindow):
         core.store_settings(settings)
 
     def generate_image(self):
-        self.thread = OneArgThread(False, self.check_net, self)
-        self.thread.start()
-        if not self.thread_result:
+        if not self.check_net(False):
             return
         prompt = self.prompt_input.text()
         if not prompt:
             QMessageBox.critical(self, "Error", "Please enter a prompt.")
             return
         nsfw_level = self.settings['nsfw_level']
-        self.thread = TwoArgThread(prompt, nsfw_level, check_nsfw, self)
-        self.thread.start()
-        if self.thread_result:
+        if check_nsfw(text=prompt, level=nsfw_level):
             QMessageBox.critical(self, "hmm...", "NSFW content detected, more info at https://en.wikipedia.org/wiki/Not_safe_for_work")
             return
         service_type = self.service_type
@@ -552,7 +532,7 @@ class ImageGeneratorApp(QMainWindow):
                 data = image.tobytes("raw", "RGBA")
                 qimage = QImage(data, image.width , image.height, QImage.Format_RGBA8888)
                 pixmap = QPixmap.fromImage(qimage)
-                desired_width = self.settings['images_show_weight']
+                desired_width = self.settings['images_show_width']
                 desired_height = self.settings['images_show_height']
                 pixmap = pixmap.scaled(desired_width, desired_height, aspectRatioMode=Qt.KeepAspectRatio)
                 self.image_label.setPixmap(pixmap)  
