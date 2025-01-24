@@ -4,7 +4,7 @@ from requests.api import request as request_api
 from g4f import Client as G4fClient
 from g4f.api import run_api
 import urllib.parse
-from json import load, dumps
+from json import load, dumps, JSONDecodeError
 import sqlite3, os, sys
 from threading import Thread
 from logger import log
@@ -79,16 +79,34 @@ def store_settings(settings):
 
 
 def read_settings():
-    log("reading settings", "debug")
+    def check_dicts(dict1, dict2):
+        for key in list(dict1.keys()):
+            if key not in list(dict2.keys()):
+                return True
+            elif isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                if check_dicts(dict1[key], dict2[key]):
+                    return True
+    log("reading settings")
     configs = read_configs()
     settings_file_name = configs['defaults']['settings_file_name']
     default_settings = configs['settings']
     try:
         with open(settings_file_name, 'rt') as file:
-            return load(file)
-    except:
+            saved_settings = load(file)
+    except (FileNotFoundError, JSONDecodeError) as e:
+        log(f"Over Writing settings because there is an error FileNotFoundError or JSONDecodeError: {e}", "Error")
         store_settings(default_settings)
         return default_settings
+    else:
+        # Check if configs updated
+        over_write_dict = check_dicts(default_settings, saved_settings)
+        if over_write_dict:
+            log("Over Writing settings because changes detect.")
+            store_settings(default_settings)
+            return default_settings
+        else:
+            return saved_settings
+
 
 
 def get_main_database_path():
@@ -334,9 +352,10 @@ class AiClient:
     base_url = None
     local_api_status = False # False means isn't running and True means local api server is running.
 
-    def init(self, ignore_database: bool=False, conversion_id: int | str=None, database_path: str=None, model: str=None, base_url: str=None, service_type: str='g4f', conversion: list=[], model_id: int=None, username='user'):
+    def init(self, api_key: str=None, ignore_database: bool=False, conversion_id: int | str=None, database_path: str=None, model: str=None, base_url: str=None, service_type: str='g4f', conversion: list=[], model_id: int=None, username='user'):
         log(f"Using {self.service} service")
         self.username = username
+        self.api_key = api_key
         self.database_path = database_path
         self.conversion_id = conversion_id
         self.model = model
@@ -373,6 +392,7 @@ class AiClient:
         self.conversion_id = None
         self.database_path = None
         self.username = None
+        self.api_key = None
         self.original_stdout = sys.stdout
         log("AiClient object created.")
 
@@ -436,6 +456,8 @@ class AiClient:
             "stream": False,
             "messages": conversion_update
         }
+        if self.api_key:
+            body['api_key'] = self.api_key
         try:
             try:
                 response = self.send(url=self.base_url, method='post', json=body)
@@ -462,10 +484,17 @@ class AiClient:
             conversion_update = self.conversion
             conversion_update.append({"role": "user", "content": prompt})
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=conversion_update,
-                )
+                if self.api_key:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=conversion_update,
+                        api_key=self.api_key,
+                    )
+                else:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=conversion_update,
+                    )
                 response = response.choices[0].message.content
             except Exception as e:
                 raise e
@@ -477,10 +506,10 @@ class AiClient:
         else:
             return [True, response]
 
-    def send(self, method: str, url: str):
+    def send(self, method: str, url: str, json=None):
         method = method.lower()
         try:
-            response = request__(method, url)
+            response = request__(method, url, json=json)
             status = response.status_code
             if status != 200:
                 log(f"Response {status} in sending request to {url} using method={method}", log_type='warn')
