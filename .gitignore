@@ -8,3 +8,5 @@ storage/databases/*
 # Ignore common virtualenv directories
 venv/
 .venv/
+# Ignore Pycharm .idea directory
+.idea/
