@@ -1,5 +1,5 @@
 from webbrowser import open as webbrowser_open
-from PyQt5.QtWidgets import QApplication, QMessageBox, QComboBox, QMainWindow, QCheckBox, QAction, QMenu, QScrollArea, QStatusBar, QMenuBar, QSpacerItem, QWidget, QLabel, QVBoxLayout, QDialog, QPushButton, QTabWidget, QTextEdit, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QMessageBox, QLineEdit, QComboBox, QMainWindow, QCheckBox, QAction, QMenu, QScrollArea, QStatusBar, QMenuBar, QSpacerItem, QWidget, QLabel, QVBoxLayout, QDialog, QPushButton, QTabWidget, QTextEdit, QSizePolicy
 from PyQt5.QtCore import QRect, QCoreApplication, QMetaObject, QThread, pyqtSignal
 from PyQt5.QtGui import QFont, QIcon
 from functools import partial
@@ -137,11 +137,17 @@ class GUI:
         except Exception as e:
             QMessageBox.critical(self.main_window, "Error in settings", str(e))
 
+    def save_api_key(self):
+        api_key = self.api_key_input.toPlainText()
+        settings = core.read_settings()
+        settings['ai']['api_key'] = api_key
+        core.store_settings(settings)
+
     def setupUi(self, main_window):
         media = core.list_media()
         self.main_window = main_window
         self.main_window.setObjectName("main_window")
-        self.main_window.resize(640, 615)
+        self.main_window.resize(640, 650)
         self.main_window.setWindowIcon(QIcon(media['main_ui']['icon']))
         font = QFont()
         font.setFamily("Noto Sans")
@@ -185,7 +191,6 @@ class GUI:
         chats_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.chats_layout.addItem(chats_spacer)
 
-
         self.messages_layout = QWidget(self.main_layout)
         self.messages_layout.setGeometry(QRect(170, 10, 461, 341))
         self.messages_layout.setObjectName("messages_layout")
@@ -221,7 +226,7 @@ class GUI:
         self.agent_status_label.setFont(font)
         self.agent_status_label.setObjectName("agent_status_label")
         self.notif_label = QLabel(self.main_layout)
-        self.notif_label.setGeometry(QRect(10, 505, 620, 60))
+        self.notif_label.setGeometry(QRect(10, 540, 620, 60))
         self.notif_label.setObjectName("notif_label")
         self.notif_label.setDisabled(True)
         self.main_window.setCentralWidget(self.main_layout)
@@ -303,7 +308,7 @@ class GUI:
         self.about_menu.setTitle(self._translate("main_window", "About me"))
 
         self.service_type_combobox= QComboBox(self.main_layout)
-        self.service_type_combobox.setGeometry(QRect(10, 465, 120, 30))
+        self.service_type_combobox.setGeometry(QRect(10, 465, 200, 30))
         self.service_type_combobox.setObjectName("service_type_combobox")
         for service_type in self.service_types:
             icon = QIcon(media['service_type'][service_type.lower()])
@@ -312,9 +317,15 @@ class GUI:
         self.core_objects['client'].service_type = self.service_type.lower()
         self.service_type_combobox.currentIndexChanged.connect(self.change_service_type)
 
+        self.api_key_input = QLineEdit(self.main_layout)
+        self.api_key_input.setGeometry(QRect(10, 500, 200, 30))
+        self.api_key_input.setObjectName("api_key_input")
+        self.api_key_input.setPlaceholderText("Enter API key if needed")  # Optional placeholder text
+
         self.send_button.clicked.connect(self.send_prompt)
         self.new_chat_button.clicked.connect(self.create_new_chat)
         self.ping_button.clicked.connect(self.ping)
+        self.api_key_input.editingFinished.connect(self.save_api_key)
         self.set_theme('read')
 
         QMetaObject.connectSlotsByName(self.main_window)
@@ -370,6 +381,8 @@ class GUI:
 
         self.agent_status_label.setText(
             self._translate("main_window", "<font color='green'>Agent is running task...</font>"))
+        self.api_key = self.api_key_input.text()
+        self.core_objects['client'].api_key = self.api_key
         self.agent_status_label.update()  # Update the label immediately
 
         prompt = self.prompt_text_edit.toPlainText()
