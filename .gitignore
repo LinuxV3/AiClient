@@ -1,0 +1,9 @@
+# Ignore python compiled files (cython)
+__pycache__/
+# Ignore settings
+storage/json/settings.json
+# Ignore all databases
+storage/databases/*
+# Ignore common virtualenv directories
+venv/
+.venv/
