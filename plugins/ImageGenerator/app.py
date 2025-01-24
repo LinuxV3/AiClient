@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTextEdit, QVBox
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PIL import Image
-from g4f import Client as g4f_client
 from os.path import expanduser
 import io
 from re import findall
