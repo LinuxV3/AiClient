@@ -7,7 +7,7 @@ import urllib.parse
 from json import load, dumps
 import sqlite3, os, sys
 from threading import Thread
-import logging
+from logger import log
 
 
 def request__(method, url, **kwargs) -> Any:
@@ -21,18 +21,6 @@ def get_file_url(file_name):
     return urllib.parse.urljoin(server_url, 'api/files/' + file_name)
 
 
-log_format = '%(asctime)s -> %(levelname)s: %(message)s'
-date_format = '%Y-%m-%d %H:%M:%S'
-logger = logging.getLogger("Core")
-logger.setLevel(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format=log_format, datefmt=date_format)
-log_types = {"debug": logger.debug,
-             "info": logger.info,
-             "error": logger.error,
-             "critical": logger.critical,
-             'warning': logger.warning,
-             'warn': logger.warn,
-             'log': logger.log}
 built_databases = []
 server_url = 'http://aiclient.pythonanywhere.com/'
 configs_file_path = "storage/json/configs.json"
@@ -525,14 +513,6 @@ def list_media():
             file.write(get_file(url))
             file.close()
     return media_files
-
-
-def log(dest: str, log_type='INFO'):
-    log_type = log_type.lower()
-    if log_type in log_types:
-        log_types[log_type](dest)
-    else:
-        logger.debug(dest)
 
 
 def get_model_info(database: DB, **kwargs):
