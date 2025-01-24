@@ -21,11 +21,21 @@ def get_file_url(file_name):
     return urllib.parse.urljoin(server_url, 'api/files/' + file_name)
 
 
+log_format = '%(asctime)s -> %(levelname)s: %(message)s'
+date_format = '%Y-%m-%d %H:%M:%S'
+logger = logging.getLogger("Core")
+logger.setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format=log_format, datefmt=date_format)
+log_types = {"debug": logger.debug,
+             "info": logger.info,
+             "error": logger.error,
+             "critical": logger.critical,
+             'warning': logger.warning,
+             'warn': logger.warn,
+             'log': logger.log}
 built_databases = []
 server_url = 'http://aiclient.pythonanywhere.com/'
 configs_file_path = "storage/json/configs.json"
-logger = logging.getLogger("Core")
-logger.setLevel(logging.DEBUG)
 
 """
 def get_configs(slices):
@@ -487,7 +497,7 @@ class AiClient:
             if status != 200:
                 log(f"Response {status} in sending request to {url} using method={method}", log_type='warn')
             else:
-                log(f"Successfuly request to {url} using method={method}")
+                log(f"Successfully request to {url} using method={method}")
             return response
         except Exception as e:
             log(f"Error in sending request to {url} using method={method} -> {e}")
@@ -519,12 +529,8 @@ def list_media():
 
 def log(dest: str, log_type='INFO'):
     log_type = log_type.lower()
-    if log_type == 'info':
-        logger.info(dest)
-    elif log_type == 'warn':
-        logger.warning(dest)
-    elif log_type == 'error':
-        logger.error(dest)
+    if log_type in log_types:
+        log_types[log_type](dest)
     else:
         logger.debug(dest)
 
