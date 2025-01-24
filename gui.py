@@ -552,10 +552,15 @@ class SettingsApp(QMainWindow):
         QMessageBox.information(self, "success", "Settings saved!")
 
 
-if __name__ == "__main__":
+
+def run_gui():
     app = QApplication(sys.argv)
     main_window = QMainWindow()
     ui = GUI()
     ui.setupUi(main_window)
     main_window.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    run_gui()
