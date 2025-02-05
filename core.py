@@ -1,11 +1,9 @@
-import shutil, json
 from typing import Any
 from requests.api import request as request_api
 from g4f import Client as G4fClient
 from g4f.api import run_api
 import urllib.parse
-from json import load, dumps, JSONDecodeError
-import sqlite3, os, sys
+import sqlite3, os, sys, shutil, json, requests
 from threading import Thread
 from logger import log
 
@@ -37,7 +35,7 @@ def get_configs(slices):
 def read_configs():
     try:
         with open(configs_file_path, 'rt') as file:
-            configs = load(file)
+            configs = json.load(file)
         log('configs file read')
         return configs
     except Exception as e:
@@ -92,8 +90,8 @@ def read_settings():
     default_settings = configs['settings']
     try:
         with open(settings_file_name, 'rt') as file:
-            saved_settings = load(file)
-    except (FileNotFoundError, JSONDecodeError) as e:
+            saved_settings = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
         log(f"Over Writing settings because there is an error FileNotFoundError or JSONDecodeError: {e}", "Error")
         store_settings(default_settings)
         return default_settings
@@ -154,11 +152,11 @@ def configure_app():
     settings_content = configs['defaults']['settings']
     settings_file = configs['config']['create']['files']['settings']
     with open(settings_file, 'wt') as file:
-        file.write(dumps(settings_content))
+        file.write(json.dumps(settings_content))
         file.close()
     database_file = configs['config']['create']['files']['database']
     make_db(name=database_file)
-    """media_files_url = configs['urls']['media']
+    media_files_url = configs['urls']['media']
     for media_path in media_files_url.keys():
         media_path_ = os.path.join("storage/media", media_path)
         if os.path.exists(media_path_):
@@ -168,7 +166,7 @@ def configure_app():
         content = get_file(url)
         with open(media_path_, save_type) as file:
             file.write(content)
-"""
+
 
 def get_app_status():
     return request__('get', f"{server_url}api?action=app_status").json()
@@ -542,6 +540,25 @@ def list_media():
             file.write(get_file(url))
             file.close()
     return media_files
+
+
+def download_file(file_url, file_save_path, log_func, progress_func):
+    try:
+        log_func(f"Downloading {file_url}...\n")
+        response = requests.get(file_url, stream=True)
+        response.raise_for_status()
+
+        total_size = int(response.headers.get('content-length', 0))
+        with open(file_save_path, 'wb') as f:
+            downloaded_size = 0
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+                downloaded_size += len(chunk)
+                progress_func(downloaded_size, total_size)
+
+        log_func(f"Downloaded {file_url} to {file_save_path}\n")
+    except Exception as e:
+        log_func(f"Failed to download {file_url}: {e}\n")
 
 
 def get_model_info(database: DB, **kwargs):
