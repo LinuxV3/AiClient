@@ -3,15 +3,9 @@ from PyQt5.QtCore import QRect, Qt, QMetaObject, QCoreApplication
 from PyQt5.QtGui import QFont, QCursor, QIcon
 from typing import Any
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QPushButton, QComboBox, QMessageBox, QWidget, QVBoxLayout, QLayout, QHBoxLayout, QLabel
-import googletrans  # Import Google Translate API, Just 3.1.0a0 version works correctly.
-import sys
+from googletrans import Translator  # Import Google Translate API, Just 3.1.0a0 version works correctly.
+import sys, core
 import pyperclip  # Import pyperclip for clipboard operations
-from os.path import exists # import exists from os.path instead of import os for optimizing app
-
-from googletrans import Translator
-
-import core
-import urllib.parse
 
 
 # Define the main UI class for the Translator application
@@ -348,7 +342,7 @@ class TranslatorApp:
 
             text = self.input_text.toPlainText()
 
-            translator_obj = googletrans.Translator()
+            translator_obj = Translator()
             translated_text = translator_obj.translate(text, src=from_lang_key, dest=to_lang_key)
 
             self.output_text.setText(str(translated_text.text))
