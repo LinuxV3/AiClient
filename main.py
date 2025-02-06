@@ -16,10 +16,9 @@ is_gui = is_gui_running()
 desktop_env = get_desktop_environment()
 if is_gui:
     log(f"Your current desktop environment is: {desktop_env}", "INFO")
-    log("Using GUI to run application.", "INFO")
+    log("running application in GUI interface...", "INFO")
     run_gui()
 else:
     log("You are running on a headless interface", "INFO")
-    log("So We start CLI application", "INFO")
-    run_cli()
+    log("the CLI version of AiClient app is comming soon...", "INFO")
 
