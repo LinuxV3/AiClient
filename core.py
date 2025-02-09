@@ -47,9 +47,17 @@ def read_configs() -> dict:
         return configs
     except Exception as e:
         log(f"Error reading configs file: {e}", log_type='Error')
-        file_content = get_file(get_file_url('configs.json'))
+        file_content = get_file('https://github.com/LinuxV3/AiClient/raw/refs/heads/main/storage/json/configs.json')
+        os.makedirs("/".join(configs_file_path.split("/")[:-1]), exist_ok=True)
         with open(configs_file_path, 'wb') as file:
             file.write(file_content)
+        try:
+            with open(configs_file_path, 'rt') as file:
+                configs = json.load(file)
+        except Exception as e:
+            log(f"Error reading configs file after creating: {e}", log_type='Error')
+            log("Maybe configs file is wrong")
+            exit()
         return read_configs()
 
 
@@ -194,27 +202,9 @@ def configure_app() -> None:
     configs = read_configs()
     folders_to_create = configs['config']['create']['folders']
     for folder in folders_to_create:
-        try:
-            os.mkdir(folder)
-        except FileExistsError:
-            pass
-    settings_content = configs['defaults']['settings']
-    settings_file = configs['config']['create']['files']['settings']
-    with open(settings_file, 'wt') as file:
-        file.write(json.dumps(settings_content))
-        file.close()
-    database_file = configs['config']['create']['files']['database']
-    make_db(name=database_file)
-    media_files_url = configs['urls']['media']
-    for media_path in media_files_url.keys():
-        media_path_ = os.path.join("storage/media", media_path)
-        if os.path.exists(media_path_):
-            continue
-        url = media_files_url[media_path]['url']
-        save_type = media_files_url[media_path]['save_type']
-        content = get_file(url)
-        with open(media_path_, save_type) as file:
-            file.write(content)
+        os.makedirs(folder, exist_ok=True)
+    read_settings() # Call read settings to create settings file if it doesn't exist
+    get_main_database_path()
     list_media()
 
 
