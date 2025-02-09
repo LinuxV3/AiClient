@@ -21,7 +21,7 @@ log_types = {"debug": logger.debug,
              "error": logger.error,
              "critical": logger.critical,
              'warning': logger.warning,
-             'warn': logger.warn,
+             'warn': logger.warning,
              'log': logger.log}
 
 
@@ -129,7 +129,7 @@ if install_packages:
 args = [arg.lower() for arg in sys.argv]
 python_versions = ['3.12.3']
 python_versions_str = ', '.join(python_versions)
-install_dir = os.path.realpath(os.path.join(os.path.expanduser("~"), 'AiClient'))
+install_dir = os.path.realpath(os.path.expanduser("~"))
 git_url = "https://github.com/linuxv3/AiClient"
 windows_installer_file = "https://raw.github.usercontent.com/linuxv3/AiClient/scripts/AiClient4Win.msi"
 repo_dir = "./AiClient"
@@ -187,7 +187,7 @@ if (os_name == 'windows' or os_name == 'win') and not use_source_code:
     log("Downloading app installer for Windows...", 'info')
     try:
         save_path = os.path.join(install_dir, 'installer')
-        os.makedirs(save_path)
+        os.makedirs(save_path, exist_ok=True)
         save_path = os.path.join(save_path, windows_installer_file.split("/")[-1])
         download_file(windows_installer_file, save_path)
     except Exception as e:
@@ -231,18 +231,28 @@ if use_source_code:
             exit()
         else:
             log("Repository folder found successfuly.", "info")
+    app_root_path = os.path.join(install_dir, repo_dir)
+    if os.path.isdir(app_root_path):
+        log("Old installation files already exists, removing them...", "warn")
+        try:
+            shutil.rmtree(app_root_path)
+        except Exception as e:
+            log("Error in removing old installation files: " + str(e), "error")
+            exit()
+    log(f"Installation directory: {install_dir}", "debug")
     try:
-        os.makedirs(exist_ok=True)
+        os.makedirs(install_dir, exist_ok=True)
     except Exception as e:
         log("Error in make installtion directory: " + str(e), "error")
         exit()
     try:
-        shutil.copy(repo_dir, install_dir)
+        shutil.copytree(repo_dir, app_root_path)
     except Exception as e:
         log("Error in copy cloned directory to installtion directory: " + str(e), "error")
         exit()
     install_dir = os.path.join(install_dir, repo_dir)
     venv_path = os.path.join(install_dir, 'venv')
+    os.chdir(install_dir)
     if pythonv in python_versions:
         log("Source code downloaded successfuly, installing[build using pyinstaller]...")
         install_package("pyinstaller")
@@ -250,19 +260,21 @@ if use_source_code:
         subprocess.run([sys.executable, "-m", "venv", venv_path])
         activate_venv(venv_path)
         python_bin_path = os.path.join(venv_path, 'bin', 'python')
-        install_package(None, python_bin_path, 'requirements.in')
-        subprocess.run([python_bin_path, "-m", "pyinstaller", "--onefile", "main.py"])
+        install_package(None, python_bin_path, 'requirements.txt')
+        install_package('pyinstaller', python_bin_path)
+        subprocess.run(["pyinstaller", "--onefile", "main.py"])
         app_bin_path = os.path.join(install_dir, 'dist', 'main')
 
         log("Tried to install[build and compile using pyinstaller]")
         log("Result is unknown")
-        is_added = add_alias_to_bashrc("aic", app_bin_path)
+        is_added = add_alias_to_bashrc("aic", f"{app_bin_path} --work-directory {install_dir}")
+        os.system("exec $SHELL")
         if is_added:
             log("the AiClient alias added to .bashrc successfuly.")
-            log("Now you can run the App after restart the shell using `aic` command.")
+            log("Now you can run using `aic` command.")
         else:
             log("Maybe the App alias already added to .bashrc")
-            log("And you can run the App after restart the shell using `aic` command.")
+            log("And you can run using `aic` command.")
         exit()
     else:
         log("Python version not supported, use --info option for see supported python versions", "warn")
