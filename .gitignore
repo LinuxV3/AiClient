@@ -1,6 +1,9 @@
 # Ignore python compiled files (cython)
 __pycache__/
-plugins/*/__pycache__/
+plugins/Translator/__pycache__/
+plugins/Settings/__pycache__/
+plugins/ImageGenerator/__pycache__/
+scripts/__pycache__/
 # Ignore settings
 storage/json/settings.json
 # Ignore all databases
