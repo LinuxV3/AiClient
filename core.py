@@ -1,11 +1,67 @@
 from typing import Any
-from requests.api import request as request_api
-from g4f import Client as G4fClient
-from g4f.api import run_api
-import urllib.parse
-import sqlite3, os, sys, shutil, json, requests
+import sqlite3, os, sys, shutil, json, importlib, subprocess
 from threading import Thread
 from logger import log
+try:
+    from requests.api import request as request_api
+    from g4f import Client as G4fClient
+    from g4f.api import run_api
+    import urllib.parse, requests
+except ImportError:
+    install_packages = True
+else:
+    install_packages = False
+
+
+def is_package_installed(package_name):
+    try:
+        importlib.import_module(package_name)
+        return True
+    except ImportError:
+        return False
+
+def install_package(package_name, interperter=None, req_file=None):
+    if not interperter:
+        interperter = sys.executable
+    if req_file:
+        package_name = req_file
+    if not is_package_installed(package_name):
+        try:
+            if req_file:
+                subprocess.check_call([interperter, "-m", "pip", "install", '-r', package_name])
+            else:
+                subprocess.check_call([interperter, "-m", "pip", "install", package_name])
+            log(f"Successfully installed {package_name}")
+        except subprocess.CalledProcessError as e:
+            log(f"Failed to install {package_name}. Error: {e}")
+    else:
+        log(f"{package_name} is already installed.")
+
+
+if install_packages:
+    log("Installing packages which is required...")
+    log("Please dont leave the application and just wait, it takes 1-10 minutes.")
+    if not os.path.isfile("requirements.txt"):
+        install_package("requests")
+        import requests
+        with open("requirements.txt", 'wt') as file:
+            file.write(requests.get("https://github.com/LinuxV3/AiClient/raw/refs/heads/main/storage/requirements.txt").content)
+    install_package('requirements.txt', sys.executable, req_file='requirements.txt')
+    try:
+        from requests.api import request as request_api
+        from g4f import Client as G4fClient
+        from g4f.api import run_api
+        import urllib.parse, requests
+    except ImportError:
+        install_packages = True
+    else:
+        install_packages = False
+    if install_packages:
+        log("Failed to install required packages.", "Error")
+        log("Install them manually by running `pip install -r requirements.txt`", "debug")
+        exit()
+    else:
+        log("Succuessfuly installed all packages.")
 
 
 def request__(method: str, url: str, **kwargs) -> Any:
