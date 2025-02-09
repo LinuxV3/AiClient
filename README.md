@@ -8,15 +8,9 @@ A free unlimited multi interface (GUI, CLI) AI client for Linux and Windows whic
 Installation on Windows is so easy!
 Just download the app last release in Release Section with `.msi` or `.exe` format and launch it then follow the steps to install the app
 #### Linux
-Unfortunately we just support Debian-based Linux distribution and for other distribution you can install and build the app from the source code
 
-So for Debian-based distribution like Ubuntu, Debian, Mint Linux or other download the app last release in Release Section with `.deb` format
+we just support Windows auto GUI installer and if you are using Linux you have to use installer script on CLI which is not recommended (anyway if you want to use CLI auto installer script read [here](https://github.com/)) and its better to install it from the source code on the GitHub using bellow commands
 
-then run the following command to install it by `apt` package manager.
-
-```bash
-sudo apt install "downloaded_file_path"
-```
 
 ## Install from the source code
 
@@ -68,9 +62,9 @@ Hope to enjoy your using !
 
 ## Usage
 
-The app is so User-Friendly and has a GUI interface so it doesn`t need to any guide or docs but We created a pdf document for anyone who don`t know how to use the App
+The app is so User-Friendly and has a GUI interface so it does not need to any guide or docs but We created a PDF document for anyone who do not know how to use the App
 
-The full docs `.pdf` file designed and is ready in `UserGuide.pdf` file in the GitHub repository
+The full docs `.PDF` file designed and is ready in `UserGuide.pdf` file in the GitHub repository
 also you can download it [from here](https://aiclient.pythonanywhere.com/src/UserGuide.pdf)
 
 
