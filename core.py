@@ -8,20 +8,21 @@ from threading import Thread
 from logger import log
 
 
-def request__(method, url, **kwargs) -> Any:
+def request__(method: str, url: str, **kwargs) -> Any:
+    # This function requests to a web url address
     log(f"Try send request to {url}", "debug")
     response = request_api(method, url)
     log(f"Request sent with {response.status_code} status code", "debug")
     return response
 
 
-def get_file_url(file_name):
+def get_file_url(file_name: str) -> str: # make the url of downloading the file
     return urllib.parse.urljoin(server_url, 'api/files/' + file_name)
 
 
-built_databases = []
-server_url = 'http://aiclient.pythonanywhere.com/'
-configs_file_path = "storage/json/configs.json"
+built_databases = [] # This list contains the databases which the base queries executed on it
+server_url = 'http://aiclient.pythonanywhere.com/' # Its a free host from https://pythonanywhere.com
+configs_file_path = "storage/json/configs.json" # Configs file is a json file which contains settings, models, and other values
 
 """
 def get_configs(slices):
@@ -32,7 +33,13 @@ def get_configs(slices):
     return value""" # unusefull
 
 
-def read_configs():
+def read_configs() -> dict:
+    """Reading the configs
+    This functions read the configs from the configs file which is stored is `configs_file_path` var
+
+    Returns:
+        Dict: configs content
+    """
     try:
         with open(configs_file_path, 'rt') as file:
             configs = json.load(file)
@@ -46,12 +53,28 @@ def read_configs():
         return read_configs()
 
 
-def get_available_models(service_type: str):
+def get_available_models(service_type: str) -> list:
+    """Read the configs and return the available ai models
+
+    Args:
+        service_type (str): The using service type (g4f or Local)
+
+    Returns:
+        List: available ai models
+    """    
     configs = read_configs()
     return [model['id'] for model in configs['models']['available'][service_type]['text']['casual']]
 
 
-def make_db(name: str=None):
+def make_db(name: str=None) -> str:
+    """Create, config the database and execute some base queries on it
+
+    Args:
+        name (str, optional): the name of the created database. Defaults to None. if the name is None the name will read from the configs file
+
+    Returns:
+        string: the database name
+    """    
     configs = read_configs()
     db_files_format = configs['format']['database']
     if name:
@@ -68,7 +91,12 @@ def make_db(name: str=None):
         return make_db(name=configs['defaults']['database_path'])
 
 
-def store_settings(settings):
+def store_settings(settings: dict) -> None:
+    """Save the settings to the settings file by dump it using json moudel
+
+    Args:
+        settings (dict): a dict of settings
+    """
     log("storing settings", 'debug')
     configs = read_configs()
     settings_file_name = configs['defaults']['settings_file_name']
@@ -76,7 +104,15 @@ def store_settings(settings):
         json.dump(settings, file)
 
 
-def read_settings():
+def read_settings() -> dict:
+    """
+    Read the settings from the settings file by load it using json moudel
+    if the file does not exist it will read the default settings from the configs file and write it in the settings file then returns the settings
+    if a key of the settings missed it will replace it with the default value from the configs file
+
+    Returns:
+        dict: a dict of the settings
+    """
     def check_dicts(dict1, dict2):
         for key in list(dict1.keys()):
             if key not in list(dict2.keys()):
@@ -96,7 +132,7 @@ def read_settings():
         store_settings(default_settings)
         return default_settings
     else:
-        # Check if configs updated
+        # Check if configs updated or a key missed
         over_write_dict = check_dicts(default_settings, saved_settings)
         if over_write_dict:
             log("Over Writing settings because changes detect.")
@@ -107,7 +143,12 @@ def read_settings():
 
 
 
-def get_main_database_path():
+def get_main_database_path() -> str:
+    """get the main database path and create its tables
+
+    Returns:
+        string: the name of the database
+    """
     database_path = get_main_database_path_()
     db = DB(database_path=database_path)
     db.init()
@@ -115,7 +156,12 @@ def get_main_database_path():
     return database_path
 
 
-def get_main_database_path_():
+def get_main_database_path_() -> str:
+    """Detect the main database path
+
+    Returns:
+        str: the name of the database
+    """
     configs = read_configs()
     database_path = configs['path']['database']
     databases = []
@@ -140,9 +186,12 @@ def get_main_database_path_():
         return make_db()
 
 
-def configure_app():
+def configure_app() -> None:
+    """
+    configure the app
+    config include downloading the media (the pictures, json files which uses in the app), initalize the database
+    """
     configs = read_configs()
-    app_status = get_app_status()
     folders_to_create = configs['config']['create']['folders']
     for folder in folders_to_create:
         try:
@@ -168,16 +217,23 @@ def configure_app():
             file.write(content)
 
 
-def get_app_status():
-    return request__('get', f"{server_url}api?action=app_status").json()
+def get_file(url: str) -> str | bytes:
+    """Downloads the file and returns its content
 
+    Args:
+        url (str): the url of the file
 
-def get_file(url):
+    Returns:
+        str | bytes: the files content
+    """    
     return request__(method='get', url=url).content
 
 
 
 class DB:
+    """
+    DB is a object for control the database
+    """
     connection = None
     cursor = None
     db_path = None
@@ -194,7 +250,7 @@ class DB:
         log(f"Connected to database: {database_path}")
         self.cursor = self.connection.cursor()
 
-    def commit(self):
+    def commit(self) -> None:
         self.connection.commit()
 
     def quit(self) -> None:
@@ -202,7 +258,7 @@ class DB:
         self.connection.close()
         log(f"database connection closed. path: {self.db_path}")
 
-    def query(self, query: str, params: tuple=None, full_response=False, print_log=True):
+    def query(self, query: str, params: tuple=None, full_response=False, print_log=True) -> tuple | list | dict | None:
         if print_log:
             log(f"Running query: {query} -> params: {params}")
         try:
@@ -272,7 +328,7 @@ class DB:
         return self.to_dict(self.query(f"SELECT id, model_id, title, created_at FROM conversions WHERE id=?", tuple([conversion_id])), ['id', 'model_id', 'title', 'created_at'])
 
     def build_tables(self) -> None: # building the database tables
-        sql_queries = [
+        sql_queries = [ # Some queries to build the tables
         """
         CREATE TABLE IF NOT EXISTS "models" (
             "id" INTEGER NOT NULL,
@@ -334,7 +390,7 @@ class DB:
         built_databases.append(self.db_path)
 
 
-def get_models_in_database():
+def get_models_in_database() -> dict | list | tuple | None:
     db = DB(database_path=get_main_database_path())
     db.init()
     all_models = db.get_models()
@@ -343,26 +399,27 @@ def get_models_in_database():
 
 
 class AiClient:
+    """Its a class for interacting with AI models"""
     service = ""
     service_type = ""
     conversion = []
     g4f_client = None
     base_url = None
-    local_api_status = False # False means isn't running and True means local api server is running.
+    local_api_status = False # False means isn't running and True means it`s running.
 
     def init(self, api_key: str=None, ignore_database: bool=False, conversion_id: int | str=None, database_path: str=None, model: str=None, base_url: str=None, service_type: str='g4f', conversion: list=[], model_id: int=None, username='user'):
         log(f"Using {self.service} service")
-        self.username = username
-        self.api_key = api_key
-        self.database_path = database_path
-        self.conversion_id = conversion_id
-        self.model = model
+        self.username: str = username
+        self.api_key: str | None = api_key
+        self.database_path: str = database_path
+        self.conversion_id: int = conversion_id
+        self.model: str = model
         self.conversion = conversion
-        self.service_type = service_type
-        self.base_url = base_url
-        self.configs = read_configs()
-        self.ignore_database = ignore_database
-        self.model_id = model_id
+        self.service_type: str = service_type
+        self.base_url: str = base_url
+        self.configs: dict = read_configs()
+        self.ignore_database: bool = ignore_database
+        self.model_id: int = model_id
         conversion_info = None
         if not self.ignore_database:
             if not self.database_path:
@@ -394,11 +451,14 @@ class AiClient:
         self.original_stdout = sys.stdout
         log("AiClient object created.")
 
-    def record_messages_in_db(self, message, role):
+    def record_messages_in_db(self, message: str, role: str) -> None:
         if not self.ignore_database:
             return self.database.record_message(message=message, conversion_id=self.conversion_id, role=role)
 
-    def run_local_api_server_(self):
+    def run_local_api_server_(self) -> None:
+        """
+        This function runs the local API server for the G4F service.
+        """
         log_file_name = 'local_api_status.txt'
         try:
             try:
@@ -419,11 +479,19 @@ class AiClient:
         finally:
             sys.stdout = self.original_stdout
 
-    def run_local_api_server(self):
+    def run_local_api_server(self) -> None:
+        """
+        this function calls the run_local_api_server_ function in a separate thread.
+        """
         self.local_api_thread = Thread(target=self.run_local_api_server_)
         self.local_api_thread.start()
 
-    def ask(self, prompt):
+    def ask(self, prompt: str):
+        """sends a prompt to the AI model and returns its response
+
+        Returns:
+            str: the response if the AI model
+        """        
         if self.service_type == 'g4f': # using g4f api server
             response = self.ask_g4f(prompt)
         elif self.service_type == 'local' and self.base_url:
@@ -438,13 +506,29 @@ class AiClient:
         log(f"Message from {self.model} recorded.", 'debug')
         return response
 
-    def request_to_local(self, prompt):
+    def request_to_local(self, prompt: str) -> list[bool, str]:
+        """sends a prompt to the AI model on localhost and returns its response
+        
+        Args:
+            prompt (str): the prompt to send to the AI model
+
+        Returns:
+            list[bool, str]: a list of (success: bool, message: str)
+        """
         if self.local_api_status:
             return self.request_to_api(prompt)
         else:
             return [False, 'Local api server is off.']
 
-    def request_to_api(self, prompt):
+    def request_to_api(self, prompt: str) -> list[bool, str]:
+        """Sends a request to the AI model on web address and returns its response
+
+        Args:
+            prompt (str): the prompt to send to the AI model
+
+        Returns:
+            list[bool, str]: a list of (success: bool, message: str)
+        """
         if not self.base_url.endswith("/v1/chat/completions"):
             self.base_url += "/v1/chat/completions"
         conversion_update = self.conversion
@@ -477,7 +561,15 @@ class AiClient:
         else:
             return [True, response]
 
-    def ask_g4f(self, prompt):
+    def ask_g4f(self, prompt: str) -> list[bool, str]:
+        """Sends a request to the AI model using G4F service and returns its response
+
+        Args:
+            prompt (str): the prompt to send to the AI model
+
+        Returns:
+            list[bool, str]: a list of (success: bool, message: str)
+        """
         try:
             conversion_update = self.conversion
             conversion_update.append({"role": "user", "content": prompt})
@@ -504,7 +596,8 @@ class AiClient:
         else:
             return [True, response]
 
-    def send(self, method: str, url: str, json=None):
+    def send(self, method: str, url: str, json=None) -> str:
+        """Sends a request to the specified URL using the specified method"""
         method = method.lower()
         try:
             response = request__(method, url, json=json)
@@ -519,14 +612,20 @@ class AiClient:
             raise e
 
 
-def list_media():
+def list_media() -> list[str, str, str]:
+    """makes a list of media (the pictures, json files which uses in the app)
+    Downloads the media if it's not downloaded yet or it was removed
+
+    Returns:
+        list[str, str, ...]: list of media
+    """
     configs = read_configs()
     media_files = configs['media']
     media_keys = list(media_files.keys())
     all_media = []
     for media_key in media_keys:
         all_media.extend(list(media_files[media_key].values()))
-    all_media = set(all_media) # convert all_media list to a set to delete repeated items
+    all_media = set(all_media) # convert all_media list to a set to delete duplicated items
     for media in all_media:
         if os.path.isfile(media):
             continue
@@ -542,7 +641,15 @@ def list_media():
     return media_files
 
 
-def download_file(file_url, file_save_path, log_func, progress_func):
+def download_file(file_url: str, file_save_path: str, log_func: callable, progress_func: callable):
+    """Downloads a file from the specified URL and saves it to the specified path, also logs the progress and the result
+
+    Args:
+        file_url (str): the url of the file to download
+        file_save_path (str): the path to save file
+        log_func (callable): a function to log the process
+        progress_func (callable): a function to show and complete the progress bar
+    """
     try:
         log_func(f"Downloading {file_url}...\n")
         response = requests.get(file_url, stream=True)
@@ -562,6 +669,7 @@ def download_file(file_url, file_save_path, log_func, progress_func):
 
 
 def get_model_info(database: DB, **kwargs):
+    """Fetch the info of a AI model from the informations in database"""
     key = list(kwargs.keys())[0]
     value = kwargs[key]
     all_models = database.get_models()

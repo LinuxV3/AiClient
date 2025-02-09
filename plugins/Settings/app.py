@@ -1,3 +1,20 @@
+
+
+
+print("This section will activate in next versions")
+
+
+
+
+
+
+
+
+
+
+exit()
+
+
 import os
 import sys
 import json
@@ -12,21 +29,45 @@ import requests
 import threading
 
 
+# Dictionary mapping application titles to their respective identifiers
 titles = {"AI Client": 'ai',
           "Image Generator": 'image',
           "Translator": 'translator'}
+
+# Main application path
 main_app_path = "/home/linuxer/Desktop/project/ai_client/"
+
+# Storage directory for application data
 storage = os.path.join(main_app_path, "storage")
+
+# Path to the configuration file
 configs_file_path = os.path.join(storage, 'json', "configs.json")
+
+# Main path for plugins/applications
 apps_main_path = os.path.join(main_app_path, "plugins/")
+
+# Dictionary mapping application identifiers to their respective paths
 apps_path = {"ai": main_app_path,
              "image": os.path.join(apps_main_path, 'ImageGenerator'),
              "translator": os.path.join(apps_main_path, 'Translator')}
+
+# Base settings file name
 base_settings_file_name = os.path.join(storage, "base_settings")
 
 
 class FileDownloaderApp:
+    """
+    This class represents a GUI application for downloading files from URLs.
+    It allows users to add URLs and save paths, and download files with progress tracking.
+    """
     def __init__(self, master, download_dict):
+        """
+        Initializes the FileDownloaderApp.
+        
+        Args:
+            master: The root window for the application.
+            download_dict (dict): A dictionary to store URLs and their corresponding save paths.
+        """
         self.master = master
         self.download_dict = download_dict
         master.title("Source Downloader")
@@ -52,6 +93,9 @@ class FileDownloaderApp:
         self.progress.pack()
 
     def add_to_download_dict(self):
+        """
+        Adds a URL and save path to the download dictionary.
+        """
         url = self.url_entry.get()
         save_path = self.path_entry.get()
         if url and save_path:
@@ -63,6 +107,9 @@ class FileDownloaderApp:
             messagebox.showwarning("Input Error", "Please enter both URL and Save Path.")
 
     def start_download(self):
+        """
+        Starts the download process for all URLs in the download dictionary.
+        """
         if not self.download_dict:
             messagebox.showwarning("Download Error", "No files to download. Please add files to the list.")
             return
@@ -79,6 +126,9 @@ class FileDownloaderApp:
         threading.Thread(target=self.download_files).start()  # Start download in a new thread
 
     def download_files(self):
+        """
+        Downloads files from the URLs in the download dictionary.
+        """
         for url, save_path in self.download_dict.items():
             try:
                 self.status_text.insert(tk.END, f"Downloading {url}...\n")
@@ -102,6 +152,13 @@ class FileDownloaderApp:
         messagebox.showinfo("Download Complete", "Download Complete")
 
     def update_progress(self, downloaded_size, total_size):
+        """
+        Updates the progress bar based on the downloaded size and total size.
+        
+        Args:
+            downloaded_size (int): The size of the downloaded data.
+            total_size (int): The total size of the file being downloaded.
+        """
         if total_size > 0:
             progress_percentage = (downloaded_size / total_size) * self.progress['maximum']
             self.progress['value'] = progress_percentage
@@ -109,24 +166,59 @@ class FileDownloaderApp:
 
 
 class Server:
+    """
+    This class represents a server with its description, URL, type, and key.
+    """
     def __init__(self, description, url, server_type, key):
+        """
+        Initializes a Server object.
+        
+        Args:
+            description (str): A description of the server.
+            url (str): The URL of the server.
+            server_type (str): The type of the server.
+            key (str): The key for accessing the server.
+        """
         self.description = description
         self.url = url
         self.server_type = server_type
         self.key = key
 
     def to_dict(self):
+        """
+        Converts the Server object to a dictionary.
+        
+        Returns:
+            dict: A dictionary representation of the Server object.
+        """
         return {
             "description": self.description,
             "url": self.url,
             "type": self.server_type,
             "key": self.key
         }
+
     def __repr__(self):
+        """
+        Returns a string representation of the Server object.
+        
+        Returns:
+            str: A string representation of the Server object.
+        """
         return f"Server;url={self.url},type={self.server_type},key={self.key}"
 
+
 class SettingsOptions(QWidget):
+    """
+    This class represents a settings options widget for managing servers and settings.
+    """
     def __init__(self, title):
+        """
+        Initializes the SettingsOptions widget.
+        
+        Args:
+            title (str): The title of the settings options widget.
+        """
         super().__init__()
         self.app_name = titles[title]
         self.app_path = apps_path[self.app_name]
@@ -185,6 +277,9 @@ class SettingsOptions(QWidget):
         self.layout.addWidget(self.reset_group)
 
     def add_server(self):
+        """
+        Adds a server to the server list based on user input.
+        """
         description = self.description_input.text()
         url = self.url_input.text()
         server_type = self.type_input.currentText()
@@ -200,31 +295,61 @@ class SettingsOptions(QWidget):
         self.clear_inputs()
 
     def get_settings(self):
+        """
+        Retrieves the settings from the settings file.
+        
+        Returns:
+            dict: The settings data.
+        """
         with open(os.path.join(self.app_path, "settings.json")) as f:
             data = json.load(f)
         return data
 
     def reset_settings(self):
+        """
+        Resets the settings to the base settings.
+        """
         with open(self.app_base_settings) as file:
             base_settings = json.load(file)
         self.save_settings(base_settings)
 
     def save_server_list(self, servers):
+        """
+        Saves the server list to the settings file.
+        
+        Args:
+            servers (list): A list of Server objects.
+        """
         settings = self.get_settings()
         settings["servers"] = servers
         self.save_settings(settings)
 
     def save_settings(self, settings):
+        """
+        Saves the settings to the settings file.
+        
+        Args:
+            settings (dict): The settings to save.
+        """
         with open(os.path.join(self.app_path, 'settings.json'), "w") as file:
             json.dump(settings, file)
 
     def update_server_list(self):
+        """
+        Updates the server list widget with the current servers.
+        """
         self.server_list.clear()
         for server in self.servers:
             self.server_list.addItem(server.description)
         self.save_server_list(self.servers)
 
     def load_server(self, item):
+        """
+        Loads a server's details into the input fields when selected from the list.
+        
+        Args:
+            item: The selected item from the server list.
+        """
         index = self.server_list.row(item)
         server = self.servers[index]
         self.description_input.setText(server.description)
@@ -233,12 +358,18 @@ class SettingsOptions(QWidget):
         self.key_input.setText(server.key)
 
     def clear_inputs(self):
+        """
+        Clears the input fields.
+        """
         self.description_input.clear()
         self.url_input.clear()
         self.type_input.setCurrentIndex(0)
         self.key_input.clear()
 
     def import_server_from_clipboard(self):
+        """
+        Imports a server from clipboard data.
+        """
         clipboard = QApplication.clipboard()
         data = clipboard.text()
         try:
@@ -255,6 +386,9 @@ class SettingsOptions(QWidget):
             QMessageBox.warning(self, "Import Error", "Invalid server data in clipboard.")
 
     def reset_all_settings(self):
+        """
+        Resets all settings to their default values.
+        """
         reply = QMessageBox.question(self, 'Reset All Settings',
                                      'Are you sure you want to reset all settings?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No )
@@ -264,6 +398,9 @@ class SettingsOptions(QWidget):
             QMessageBox.information(self, "Reset", "All settings have been reset.")
 
     def download_all_sources(self):
+        """
+        Downloads all sources specified in the configuration file.
+        """
         with open(configs_file_path, 'rt') as file:
             configs = json.load(file)
         app_sources_to_download = configs["sources"][self.app_name]
@@ -272,10 +409,21 @@ class SettingsOptions(QWidget):
         root.mainloop()
 
     def reinstall_app(self):
+        """
+        Placeholder function for reinstalling the app.
+        """
         QMessageBox.information(self, "Reinstall App", "Reinstalling the app... (This is a placeholder action)")
 
+
 class SettingsApp(QWidget):
+    """
+    This class represents the main settings application window.
+    It provides tabs for managing settings for different applications.
+    """
     def __init__(self):
+        """
+        Initializes the SettingsApp.
+        """
         super().__init__()
         self.setWindowTitle("Settings App")
         self.layout = QVBoxLayout()
@@ -294,6 +442,9 @@ class SettingsApp(QWidget):
 
 
 def run():
+    """
+    Runs the SettingsApp.
+    """
     app = QApplication(sys.argv)
     settings_app = SettingsApp()
     settings_app.resize(400, 300)

@@ -1,21 +1,24 @@
 # Import PyQt5 widgets, import widgets instead whole of the moudel for optimizing
 from PyQt5.QtCore import QRect, Qt, QMetaObject, QCoreApplication
-from PyQt5.QtGui import QFont, QCursor, QIcon
+from PyQt5.QtGui import QFont, QCursor, QIcon # Importing font and icon classes from PyQt5
 from typing import Any
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QPushButton, QComboBox, QMessageBox, QWidget, QVBoxLayout, QLayout, QHBoxLayout, QLabel
-from googletrans import Translator  # Import Google Translate API, Just 3.1.0a0 version works correctly.
-import sys, core
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QPushButton, QComboBox, QMessageBox, QWidget, QVBoxLayout, QLayout, QHBoxLayout, QLabel # Importing necessary PyQt5 widgets
+from googletrans import Translator, LANGUAGES  # Import Google Translate API, Just 3.1.0a0 version works correctly.
+import sys, core # Import core and system moudel
 import pyperclip  # Import pyperclip for clipboard operations
 
 
 # Define the main UI class for the Translator application
 class TranslatorApp:
     def __init__(self):
-        # Initialize themes for the application
+        # Read the settings from the file and store them in the self.settings dictionary
         self.settings = core.read_settings()['translator']
+        # Store the theme in self.current_theme
         self.current_theme = self.settings['theme']
+        # Store the source and dest language in variables
         self.src_lang = self.settings['src']
         self.dest_lang = self.settings['dest']
+        # Light theme stylesheet
         self.light_theme = """
             QMainWindow, QWidget {
                 background-color: #ffffff;
@@ -45,6 +48,7 @@ class TranslatorApp:
                 border-radius: 4px;
             }
         """
+        # Dark theme stylesheet
         self.dark_theme = """
             QMainWindow, QWidget {
                 background-color: #282a36;
@@ -77,7 +81,7 @@ class TranslatorApp:
 
     # Method to get a sorted list of languages for the translator
     def get_languages(self):
-        language_list = list(googletrans.LANGUAGES.values())
+        language_list = list(LANGUAGES.values())
         language_list.sort()
         sort_language_list = ['english', 'persian']  # put English and Persian in the first of the list for easy access
         for lang in language_list:
@@ -283,7 +287,7 @@ class TranslatorApp:
         self.target_language_combo = self.main_window.findChild(QComboBox, "target_language_combo")
 
         # initalize values for language selection combo boxes
-        self.languages = googletrans.LANGUAGES
+        self.languages = LANGUAGES
         self.languages['auto'] = 'auto detect'
         self.language_list = self.get_languages()
         from_comb_items = ['auto detect']
@@ -342,16 +346,16 @@ class TranslatorApp:
 
             text = self.input_text.toPlainText()
 
-            translator_obj = Translator()
-            translated_text = translator_obj.translate(text, src=from_lang_key, dest=to_lang_key)
+            translator_obj = Translator() # Create a Translator object
+            translated_text = translator_obj.translate(text, src=from_lang_key, dest=to_lang_key) # Translate the text
 
-            self.output_text.setText(str(translated_text.text))
-            self.src_lang = translated_text.src
-            self.dest_lang = translated_text.dest
-            self.save_settings()
+            self.output_text.setText(str(translated_text.text)) # Write translated text in output text edit
+            self.src_lang = translated_text.src # Store the source language in self.src_lang
+            self.dest_lang = translated_text.dest # Store the dest language in self.dest_lang
+            self.save_settings() # Save the source language and dest language in settings
 
-        except Exception as e:
-            QMessageBox.critical(self.main_window, "Translator", str(e))
+        except Exception as e: # Handle the exception
+            QMessageBox.critical(self.main_window, "Translator", str(e)) # Show the error in a message box
 
     # Method to clear the input and output text widgets
     def clear(self):
