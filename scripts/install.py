@@ -116,6 +116,11 @@ if install_packages:
             else:
                 log(f"`{package}` not installed!", 'error')
                 log(f"Install it then try again.", 'info')
+                log("If you see any `externally-managed-environment` error, Follow bellow steps:", 'info')
+                log(f"First install virtualenv using `{sys.executable} pip install virtualenv`", 'info')
+                log(f"now you have to create a virtualenv using `{sys.executable} -m venv installenv`", 'info')
+                log(f"Then you need to activate the virtualenv using `source installenv/bin/activate` in Linux or `installenv/Scripts/activate` in Windows", 'info')
+                log(f"Then you can run this script using `{sys.executable}` install.py")
                 exit()
     try:
         from git import Repo  # pip install gitpython
@@ -135,7 +140,7 @@ windows_installer_file = "https://raw.github.usercontent.com/linuxv3/AiClient/sc
 repo_dir = "./AiClient"
 os_name = platform.system().lower()
 pythonv = platform.python_version()
-skip_dl = '--skip-download' in args
+skip_dl = '--skip-download' in args or '--skip-dl' in args
 use_source_code = False
 given_os = False
 if '--use-source-code' in args:
@@ -152,7 +157,7 @@ for arg in args:
 just_help = '--help' in args or '-h' in args
 just_info = '--info' in args or '-i' in args
 if just_help:
-    print("Usage: python3 install.py [options]", end='\n\n\n')
+    print(f"Usage: {sys.executable} install.py [options]", end='\n\n\n')
     print("Options:")
     print("         `--help` Print this help and exit.")
     print("         `--info` Print your system info, the app info and exit.")
@@ -281,7 +286,7 @@ if use_source_code:
         log("you can install the app menualy by following 5 steps: ")
         log(f"step 0 -> First make sure you are in the installtion directory: {install_dir}")
         log("step 1 -> Install the `pyinstaller`, `virtualenv` using `pip install pyinstaller virtualenv`")
-        log("step 2 -> Create a virtualenv using `python -m venv venv` command")
+        log(f"step 2 -> Create a virtualenv using `{sys.executable} -m venv venv` command")
         log("step 3 -> activate the virtualenv by `source venv/bin/activate` command in Linux and `venv/Scripts/activate` in Windows")
         log("step 4 -> install other python packages using `pip install -r requirements.in` command")
         log("step 5 -> Build the app using `pyinstaller --onefile main.py` command")
@@ -298,10 +303,10 @@ if os_name == 'linux':
 
     log("You can install the app menualy by following 5 steps: ")
     log(f"step 0 -> First clone the repository from: {git_url} and change your working directory into it", "info")
-    log("step 1 -> Install the `pyinstaller`, `virtualenv` using `pip install pyinstaller virtualenv`")
-    log("step 2 -> Create a virtualenv using `python -m venv venv` command")
+    log(f"step 1 -> Install the `pyinstaller`, `virtualenv` using `{sys.executable} -m pip install pyinstaller virtualenv`")
+    log(f"step 2 -> Create a virtualenv using `{sys.executable} -m venv venv` command")
     log("step 3 -> activate the virtualenv by `source venv/bin/activate` command")
-    log("step 4 -> install other python packages using `pip install -r requirements.in` command")
+    log(f"step 4 -> install other python packages using `{sys.executable} -m pip install -r requirements.in` command")
     log("step 5 -> Build the app using `pyinstaller --onefile main.py` command")
     log("Now you can access a executable file in the `dist` directory, its name is `main`")
     log("You can write alias in your .bashrc")
