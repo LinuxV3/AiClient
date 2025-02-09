@@ -131,6 +131,23 @@ def get_error_message_image() -> Any:
     return Image.open(io.BytesIO(content))  # Return image object
 
 
+def get_image_from_server(url):
+    request_url = 'https://aiclient.pythonanywhere.com/image_upload'
+    try:
+        response = requests.get(request_url, json={'url': url}, stream=True)  # Send GET request
+        response.raise_for_status()  # Raise exception for bad status codes
+        c = response.content
+        with open("tempimage.png", 'wb') as file:
+            file.write(c)
+        return Image.open(io.BytesIO(c))  # Return image object
+    except Exception as e:
+        core.log(f"Error in get image from the server: {e}", 'error')
+        try:
+            return [get_error_message_image()]
+        except:
+            return []
+
+
 # Function to get welcome image
 def get_welcome_image() -> Any:
     image = core.list_media()['image_generator']['welcome']  # Get welcome image path
@@ -172,14 +189,13 @@ def generate_image(prompt: str, service_type: str, model: str) -> list[Any]:
             for image_url in images_url:
                 isok = False
                 try:
-                    response = requests.get(image_url)
-                    status_code = response.status_code
-                    if status_code == 200:
-                        images.append(Image.open(io.BytesIO(response.content)))
-                        isok = True
-                    else:
+                    try:
+                        images.append(get_image_from_server(image_url))
+                    except Exception as e:
+                        core.log(f"error in getting image: {e}", 'debug')
                         isok = False
-                        core.log(f"status code is {response.status_code}", 'debug')
+                    else:
+                        isok = True
                 except Exception as e:
                     isok = False
                 if not isok:
