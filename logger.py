@@ -10,7 +10,7 @@ log_types = {"debug": logger.debug,
              "error": logger.error,
              "critical": logger.critical,
              'warning': logger.warning,
-             'warn': logger.warn,
+             'warn': logger.warning,
              'log': logger.log}
 
 
