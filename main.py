@@ -32,6 +32,15 @@ if '--help' in args or '-h' in args:
     print(f"            --gui: force application to run in GUI interface", end='\n\n\n')
     exit()
 
+
+if '--work-directory' in args:
+    work_directory = args[args.index('--work-directory') + 1]
+    if not os.path.isdir(work_directory):
+        log(f"Work directory not found: {work_directory}", 'error')
+        exit()
+    os.chdir(work_directory)
+
+
 if '--service' in args:
     service_name = args[args.index('--service') + 1].lower()
     if service_name in ['translator', 't', 'translate']:
