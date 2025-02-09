@@ -215,6 +215,7 @@ def configure_app() -> None:
         content = get_file(url)
         with open(media_path_, save_type) as file:
             file.write(content)
+    list_media()
 
 
 def get_file(url: str) -> str | bytes:
@@ -682,5 +683,8 @@ if __name__ == '__main__':
     log("It isn't recommended.", log_type='Warn')
     # testing
     configure_app()
+
 else:
     log("Core imported.")
+    configure_app()
+
