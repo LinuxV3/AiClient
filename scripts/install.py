@@ -144,7 +144,7 @@ if '--use-source-code' in args:
     ignore_shortcut = True
 for arg in args:
     if arg.startswith("--os"):
-        os_name = arg.replace("--os", '')
+        os_name = args[args.index(arg) + 1].replace("--os", '')
         os_name = os_name.replace(" ", '')
         os_name = os_name.lower()
         given_os = True
@@ -157,6 +157,7 @@ if just_help:
     print("         `--help` Print this help and exit.")
     print("         `--info` Print your system info, the app info and exit.")
     print("         `--os YOUR_OS_NAME` give you os name manually")
+    print("         `--install-python x.y.z` Install python x.y.z version. for example `--install-python 3.12.3`")
     print("         `--use-source-code` build and download the app from the git repository.")
     print("         `--skip-download` [use along `--use-source-code` option] Use this option when you cloned the repository and want to skip downloading the repository.")
     print("\n\n\n")
@@ -173,6 +174,11 @@ if just_help or just_info:
 
 if use_source_code and given_os:
     log("You can`t use `--os` and `--use-source-code` options together", 'error')
+    exit()
+
+
+if '--install-python' in args:
+    print("Use InstallPython.sh script for install python")
     exit()
 
 
@@ -260,8 +266,7 @@ if use_source_code:
         exit()
     else:
         log("Python version not supported, use --info option for see supported python versions", "warn")
-        log("Use `--just-install` option for installing the app on your python version")
-        log("Also you can install the app menualy by following 5 steps: ")
+        log("you can install the app menualy by following 5 steps: ")
         log(f"step 0 -> First make sure you are in the installtion directory: {install_dir}")
         log("step 1 -> Install the `pyinstaller`, `virtualenv` using `pip install pyinstaller virtualenv`")
         log("step 2 -> Create a virtualenv using `python -m venv venv` command")
@@ -274,26 +279,20 @@ if use_source_code:
 
 
 if os_name == 'linux':
-    if not is_debian_based():
-        log("The app just supports Debian-based Linux distribution.")
-        log("Use `--use-source-code` to install app from the source code")
-        exit()
-    if not skip_dl:
-        try:
-            Repo.clone_from(git_url, repo_dir)
-        except Exception as e:
-            log("Error clonning repository: " + str(e), "error")
-            log("Clone the repository in AiClient folder then use `--skip-download` option", 'info')
-            log(f"Repository address: {git_url}")
-            exit()
-        else:
-            log("Repository cloned successfuly.")
-    else:
-        if not os.path.isdir(repo_dir):
-            log("Repository folder not found", "error")
-            log(f"If you cloned it change its name to {repo_dir}", 'debug')
-            exit()
-        else:
-            log("Repository folder found successfuly.", "info")
-    os.system("sudo apt install 'AiClientInstaller.deb'") # sample test
+    log("We don`t support installation on Linux", 'info')
+    log("But you can use the source code to install the app on Linux", 'info')
+    log("Use `--use-source-code` option for download and install the source code", 'info')
+    log("Also you can install the app manually by following 5 steps: ")
 
+    log("You can install the app menualy by following 5 steps: ")
+    log(f"step 0 -> First clone the repository from: {git_url} and change your working directory into it", "info")
+    log("step 1 -> Install the `pyinstaller`, `virtualenv` using `pip install pyinstaller virtualenv`")
+    log("step 2 -> Create a virtualenv using `python -m venv venv` command")
+    log("step 3 -> activate the virtualenv by `source venv/bin/activate` command")
+    log("step 4 -> install other python packages using `pip install -r requirements.in` command")
+    log("step 5 -> Build the app using `pyinstaller --onefile main.py` command")
+    log("Now you can access a executable file in the `dist` directory, its name is `main`")
+    log("You can write alias in your .bashrc")
+    log("Hope you understand")
+    log("Thanks for installing")
+    exit()
