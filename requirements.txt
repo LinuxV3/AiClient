@@ -1,0 +1,6 @@
+googletrans==3.1.0a0
+pyqt5
+pyperclip
+g4f[all]
+requests
+pillow==11.1.0
