@@ -1,11 +1,31 @@
-# Import PyQt5 widgets, import widgets instead whole of the moudel for optimizing
-from PyQt5.QtCore import QRect, Qt, QMetaObject, QCoreApplication
-from PyQt5.QtGui import QFont, QCursor, QIcon # Importing font and icon classes from PyQt5
 from typing import Any
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QPushButton, QComboBox, QMessageBox, QWidget, QVBoxLayout, QLayout, QHBoxLayout, QLabel # Importing necessary PyQt5 widgets
-from googletrans import Translator, LANGUAGES  # Import Google Translate API, Just 3.1.0a0 version works correctly.
 import sys, core # Import core and system moudel
-import pyperclip  # Import pyperclip for clipboard operations
+# Import PyQt5 widgets, import widgets instead whole of the moudel for optimizing
+try:
+    from PyQt5.QtCore import QRect, Qt, QMetaObject, QCoreApplication
+    from PyQt5.QtGui import QFont, QCursor, QIcon # Importing font and icon classes from PyQt5
+    from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QPushButton, QComboBox, QMessageBox, QWidget, QVBoxLayout, QLayout, QHBoxLayout, QLabel # Importing necessary PyQt5 widgets
+except ImportError:
+    core.log("Failed to import PyQt5. Please make sure you have PyQt5 installed.")
+    core.log("Installing PyQt5...")
+    core.install_package("PyQt5") # Install PyQt5 if not installed
+    from PyQt5.QtCore import QRect, Qt, QMetaObject, QCoreApplication
+    from PyQt5.QtGui import QFont, QCursor, QIcon # Importing font and icon classes from PyQt5
+    from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QPushButton, QComboBox, QMessageBox, QWidget, QVBoxLayout, QLayout, QHBoxLayout, QLabel # Importing necessary PyQt5 widgets
+try:
+    from googletrans import Translator, LANGUAGES  # Import Google Translate API, Just 3.1.0a0 version works correctly.
+except ImportError:
+    core.log("Failed to import PyQt5. Please make sure you have googletrans installed.")
+    core.log("Installing googletrans...")
+    core.install_package("googletrans==3.1.0a0") # Install googletrans if not installed
+    from googletrans import Translator, LANGUAGES  # Import Google Translate API, Just 3.1.0a0 version works correctly.
+try:
+    import pyperclip  # Import pyperclip for clipboard operations
+except ImportError:
+    core.log("Failed to import pyperclip. Please make sure you have pyperclip installed.")
+    core.log("Installing pyperclip...")
+    core.install_package("pyperclip==3.1.0a0") # Install pyperclip if not installed
+    import pyperclip  # Import pyperclip for clipboard operations
 
 
 # Define the main UI class for the Translator application
