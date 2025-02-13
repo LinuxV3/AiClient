@@ -1,3 +1,4 @@
+print("Please wait...")
 from typing import Any
 import sqlite3, os, sys, shutil, json, importlib, subprocess
 from threading import Thread

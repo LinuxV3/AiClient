@@ -1,3 +1,4 @@
+print("Please wait...")
 import os, sys, platform, core
 core.configure_app()
 from PyQt5.QtWidgets import QMainWindow
