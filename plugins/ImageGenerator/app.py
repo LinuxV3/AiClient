@@ -137,8 +137,6 @@ def get_image_from_server(url):
         response = requests.get(request_url, json={'url': url}, stream=True)  # Send GET request
         response.raise_for_status()  # Raise exception for bad status codes
         c = response.content
-        with open("tempimage.png", 'wb') as file:
-            file.write(c)
         return Image.open(io.BytesIO(c))  # Return image object
     except Exception as e:
         core.log(f"Error in get image from the server: {e}", 'error')
