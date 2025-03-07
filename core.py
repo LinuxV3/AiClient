@@ -2,7 +2,7 @@ print("Please wait...")
 from typing import Any
 import sqlite3, os, sys, shutil, json, importlib, subprocess
 from threading import Thread
-from logger import log
+from logger import log, set_log_level
 try:
     from requests.api import request as request_api
     from g4f import Client as G4fClient
@@ -12,6 +12,14 @@ except ImportError:
     install_packages = True
 else:
     install_packages = False
+
+
+def apply_args(args: list[str]) -> None:
+    for index, arg in enumerate(args):
+        if arg == '--log-level':
+            set_log_level(args[index + 1].strip())
+            args.pop(index + 1)
+            continue
 
 
 def is_package_installed(package_name):
@@ -534,7 +542,7 @@ class AiClient:
         self.local_api_thread = Thread(target=self.run_local_api_server_)
         self.local_api_thread.start()
 
-    def ask(self, prompt: str):
+    def ask(self, prompt: str, end_function: callable=None):
         """sends a prompt to the AI model and returns its response
 
         Returns:
@@ -546,12 +554,17 @@ class AiClient:
             response = self.request_to_local(prompt) # using g4f api on localhost, api server on local will run by run_local_api_server function
         else:
             response = self.request_to_api(prompt)
+        self.response = response
         if not response[0]: # response is a tuple of (is_success, response)
+            if end_function:
+                end_function()
             return response
         self.record_messages_in_db(prompt, role=self.username)
         log(f"Message from {self.username} recorded.", 'debug')
         self.record_messages_in_db(response[1], role=self.model)
         log(f"Message from {self.model} recorded.", 'debug')
+        if end_function:
+            end_function()
         return response
 
     def request_to_local(self, prompt: str) -> list[bool, str]:
@@ -732,6 +745,7 @@ if __name__ == '__main__':
     configure_app()
 
 else:
+    apply_args(sys.argv)
     log("Core imported.")
     configure_app()
 
