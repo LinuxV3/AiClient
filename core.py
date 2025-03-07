@@ -504,6 +504,7 @@ class AiClient:
         self.database_path = None
         self.username = None
         self.api_key = None
+        self.stream = False
         self.original_stdout = sys.stdout
         log("AiClient object created.")
 
@@ -555,7 +556,7 @@ class AiClient:
         else:
             response = self.request_to_api(prompt)
         self.response = response
-        if not response[0]: # response is a tuple of (is_success, response)
+        if not self.stream and not response[0]: # response is a tuple of (is_success, response)
             if end_function:
                 end_function()
             return response
@@ -640,13 +641,16 @@ class AiClient:
                         model=self.model,
                         messages=conversion_update,
                         api_key=self.api_key,
+                        stream=self.stream
                     )
                 else:
                     response = self.client.chat.completions.create(
                         model=self.model,
                         messages=conversion_update,
+                        stream=self.stream
                     )
-                response = response.choices[0].message.content
+                if not self.stream:
+                    response = response.choices[0].message.content
             except Exception as e:
                 raise e
             else:

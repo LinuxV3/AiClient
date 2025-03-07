@@ -23,6 +23,7 @@ class CLI:
         self._print = print
         self.took_time = 0
         self.show_progress_time = False
+        self.stream = True
 
     def run(self):
         if '--ask' in self.args:
@@ -82,10 +83,10 @@ class CLI:
         self.console.print(prompt, **kwargs)
     
     def print_sep(self):
-        self.print(self.console.rule())
+        self.console.rule()
     
     def print_title(self, title: str):
-        self.print(self.console.rule(title))
+        self.console.rule(title)
     
     def add_back_option(self, the_list: list):
         lst = [self.back_option]
@@ -132,6 +133,7 @@ class CLI:
     def ask(self, prompt, model):
         self.start_time = int(time.time() * 1000)
         self.client.model = model
+        self.client.stream = self.stream
         self.progress_event = threading.Event()
         self.request_thread = threading.Thread(target=partial(self.client.ask, prompt, self.progress_event.set))
         self.progress_thread = threading.Thread(target=self.show_progress_bar)
@@ -142,12 +144,28 @@ class CLI:
         self.progress_event.set()
         response = self.client.response
         self.end_time = int(time.time() * 1000)
-        self.took_time = int(self.end_time - self.start_time)
-        success = response[0]
-        status = "Success" if success else "Failed"
-        if self.show_progress_time:
-            self.print(f"{status}, Took {self.took_time}ms [Service: {self.client.service_type}, AI Model: {model}]")
-        self.print_pretty(response[1])
+        if not self.stream:
+            self.took_time = int(self.end_time - self.start_time)
+            success = response[0]
+            status = "Success" if success else "Failed"
+            if self.show_progress_time:
+                self.print(f"{status}, Took {self.took_time}ms [Service: {self.client.service_type}, AI Model: {model}]")
+        if self.stream:
+            self.print(" > ", end='')
+            for chunk in response[1]:
+                if chunk.choices[0].delta.content:
+                    r = chunk.choices[0].delta.content or ""
+                    for i in r:
+                        print(i, end='', flush=True)
+                        time.sleep(0.009)
+            self.print()
+            self.took_time = int(self.end_time - self.start_time)
+            success = response[0]
+            status = "Success" if success else "Failed"
+            if self.show_progress_time:
+                self.print(f"{status}, Took {self.took_time}ms [Service: {self.client.service_type}, AI Model: {model}]")
+        else:
+            self.print_pretty(response[1])
 
 
 def run_cli():
