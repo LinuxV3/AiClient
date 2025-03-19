@@ -6,5 +6,4 @@ requests
 pillow==11.1.0
 pick
 rich
-readline
 tqdm
