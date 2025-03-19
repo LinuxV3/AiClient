@@ -585,6 +585,11 @@ class SettingsApp(QMainWindow):
         self.setWindowTitle('Notification Settings App') # Set the window title
         self.setGeometry(100, 100, 300, 200) # Set the window size
 
+        # Read the current settings and set the checkbox and combo box accordingly
+        _ = core.read_settings()['ai']
+        notif_type = _['notif_type']
+        is_notif_on = _['show_notif']
+
         central_widget = QWidget() # make a central widget
         self.setCentralWidget(central_widget) # Set the widget as the central widget of the window
         layout = QVBoxLayout(central_widget) # Create a vertical layout for the central widget
@@ -596,11 +601,7 @@ class SettingsApp(QMainWindow):
         self.notification_type_combo.addItems(['Label in Bottom', 'Message Box']) # Add notification types to the combo box
         self.notification_type_combo.setCurrentText('Label in Bottom' if notif_type == 'label' else 'Message Box') # Set the current text of the combo box based on the notification type
 
-        # Read the current settings and set the checkbox and combo box accordingly
-        _ = core.read_settings()['ai']
-        notif_type = _['notif_type']
-        is_notif_on = _['show_notif']
-        self.notification_checkbox.setChecked(is_notif_on)
+        self.notification_checkbox.setChecked(True if is_notif_on == 'ON' else False)
 
         # Create a save button and connect it to the save_settings function
         self.save_button = QPushButton('Save Settings')
