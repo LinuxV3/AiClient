@@ -2,10 +2,10 @@
 
 A free unlimited multi interface (GUI, CLI) AI client for Linux and Windows which was developed with Python, PyQt5, g4f
 
-# Note
+# Note 📌
 This project is still under development and no one knows about it, that's why it doesn't have many stars or views 🤗😀
 
-# Donate and keep this project open source
+# Donate and keep this project open source 🙏
 Trc20 `TGTquY2FjJyCujwrYt6aYdwxQVaX8vkoxX`
 
 ETH `0x06aECEe6aFa7D7ec4A195cd6e15a4354143B647c`
@@ -14,7 +14,7 @@ BTC `bc1qa0s0l69vx0006yn69x00t5wqey3p3q7ra0xuh6`
 
 BNB `0x06aECEe6aFa7D7ec4A195cd6e15a4354143B647c`
 
-# Install
+# Install ⚙️
 
 #### Windows 🪟
 Installation on Windows is so easy!
