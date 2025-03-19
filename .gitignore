@@ -13,3 +13,5 @@ venv/
 .venv/
 # Ignore Pycharm .idea directory
 .idea/
+# g4f library temp dir
+har_and_cookies/
