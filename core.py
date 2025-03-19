@@ -1,6 +1,6 @@
 print("Please wait...")
 from typing import Any
-import sqlite3, os, sys, shutil, json, importlib, subprocess
+import sqlite3, os, sys, shutil, json, importlib, subprocess, signal, platform
 from threading import Thread
 from logger import log, set_log_level
 try:
@@ -14,12 +14,23 @@ else:
     install_packages = False
 
 
+def exit_signal_handler(*args, **kwargs):
+    os.system("cls") if platform.system() == 'Windows' else os.system('clear')
+    print("Exiting...")
+    exit()
+
+
+signal.signal(signal.SIGINT, exit_signal_handler)
+
+
 def apply_args(args: list[str]) -> None:
+    log_level = "ERROR"
     for index, arg in enumerate(args):
         if arg == '--log-level':
-            set_log_level(args[index + 1].strip())
+            log_level = args[index + 1].strip()
             args.pop(index + 1)
             continue
+    set_log_level(log_level)
 
 
 def is_package_installed(package_name):
@@ -29,17 +40,20 @@ def is_package_installed(package_name):
     except ImportError:
         return False
 
-def install_package(package_name, interperter=None, req_file=None):
+
+def install_package(package_name, interperter=None, req_file=None, name_to_import=None, name_to_install=None):
+    if name_to_install:
+        package_name = name_to_install
     if not interperter:
         interperter = sys.executable
     if req_file:
         package_name = req_file
-    if not is_package_installed(package_name):
+    if req_file or not is_package_installed(name_to_import):
         try:
             if req_file:
-                subprocess.check_call([interperter, "-m", "pip", "install", '-r', package_name])
+                subprocess.check_call([interperter, "-m", "pip", "install", '--quiet', '-r', package_name])
             else:
-                subprocess.check_call([interperter, "-m", "pip", "install", package_name])
+                subprocess.check_call([interperter, "-m", "pip", "install", '--quiet', package_name])
             log(f"Successfully installed {package_name}")
         except subprocess.CalledProcessError as e:
             log(f"Failed to install {package_name}. Error: {e}")
@@ -67,7 +81,7 @@ if install_packages:
         install_packages = False
     if install_packages:
         log("Failed to install required packages.", "Error")
-        log("Install them manually by running `pip install -r requirements.txt`", "debug")
+        log("Install them manually by running `pip install --quiet -r requirements.txt`", "debug")
         exit()
     else:
         log("Succuessfuly installed all packages.")
