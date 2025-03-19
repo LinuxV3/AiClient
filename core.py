@@ -6,6 +6,7 @@ from logger import log, set_log_level
 try:
     from requests.api import request as request_api
     from g4f import Client as G4fClient
+    from g4f.version import VersionUtils as G4fVersionUtils
     from g4f.api import run_api
     import urllib.parse, requests
 except ImportError:
@@ -51,9 +52,9 @@ def install_package(package_name, interperter=None, req_file=None, name_to_impor
     if req_file or not is_package_installed(name_to_import):
         try:
             if req_file:
-                subprocess.check_call([interperter, "-m", "pip", "install", '--quiet', '-r', package_name])
+                subprocess.check_call([interperter, "-m", "pip", "install", '--quiet', '-U', '-r', package_name])
             else:
-                subprocess.check_call([interperter, "-m", "pip", "install", '--quiet', package_name])
+                subprocess.check_call([interperter, "-m", "pip", "install", '--quiet', '-U', package_name])
             log(f"Successfully installed {package_name}")
         except subprocess.CalledProcessError as e:
             log(f"Failed to install {package_name}. Error: {e}")
@@ -285,6 +286,9 @@ def configure_app() -> None:
     read_settings() # Call read settings to create settings file if it doesn't exist
     get_main_database_path()
     list_media()
+    utils = G4fVersionUtils()
+    if utils.current_version != utils.latest_version:
+        os.system(f"{sys.executable} -m pip install -U g4f[all]")
 
 
 def get_file(url: str) -> str | bytes:
@@ -759,11 +763,8 @@ def get_model_info(database: DB, **kwargs):
 
 if __name__ == '__main__':
     log("It isn't recommended.", log_type='Warn')
-    # testing
     configure_app()
-
 else:
     apply_args(sys.argv)
     log("Core imported.")
     configure_app()
-
