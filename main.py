@@ -66,11 +66,12 @@ if '--service' in args:
         log("Unknown Service, We just have translator and ImageGenerator services.", "INFO")
         exit()
     exit()
-if is_gui or '--gui' in args or '-g' in args or os_name == 'windows':
+if (is_gui or '--gui' in args or '-g' in args or os_name == 'windows') and ('--cli' not in args) and ('-c' not in args):
     log(f"Your current desktop environment is: {desktop_env}", "INFO")
     log("running application in GUI interface...", "INFO")
     run_gui()
 else:
     log("You are running on a headless interface", "INFO")
-    log("the CLI version of AiClient app is comming soon...", "INFO")
-    log("If you are using a GUI interface just use --gui argument")
+    log("the CLI version of AiClient app will run...", "INFO")
+    run_cli()
+    
