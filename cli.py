@@ -3,6 +3,8 @@ from functools import partial
 import core
 from logger import log
 libs = {'rich': 'rich', 'tqdm': 'tqdm', 'pick': 'pick', 'googletrans': 'googletrans==3.1.0a0', 'readline': 'readline'}
+if os.name == 'nt':
+    libs['readline'] = 'pyreadline3'
 try:
     from rich.console import Console
     from tqdm import tqdm
