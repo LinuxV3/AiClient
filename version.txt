@@ -1,1 +1,1 @@
-Development-version
+version 0.2 beta
