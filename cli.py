@@ -2,12 +2,13 @@ import os, platform, threading, time, sys, shutil, textwrap, signal
 from functools import partial
 import core
 from logger import log
-libs = {'rich': 'rich', 'tqdm': 'tqdm', 'pick': 'pick', 'googletrans': 'googletrans==3.1.0a0'}
+libs = {'rich': 'rich', 'tqdm': 'tqdm', 'pick': 'pick', 'googletrans': 'googletrans==3.1.0a0', 'readline': 'readline'}
 try:
     from rich.console import Console
     from tqdm import tqdm
     from pick import pick
     from googletrans import Translator, LANGUAGES
+    import readline
 except ImportError as e:
     log(f"Missing required library: {e}", 'error')
     for name_to_import, name_to_install in libs.items():
@@ -17,6 +18,7 @@ except ImportError as e:
         from tqdm import tqdm
         from pick import pick
         from googletrans import Translator, LANGUAGES
+        import readline
     except Exception as e:
         log(f"Another exception during import required libraries: {e}", 'error')
         log("Install libraries manually")
@@ -219,7 +221,7 @@ class CLI:
             selected, index = pick(options, prompt, indicator=" > ")
             return selected
         elif text_input and prompt:
-            return self.console.input(prompt)
+            return input(prompt)
         else:
             raise ValueError("Bad input")
     
