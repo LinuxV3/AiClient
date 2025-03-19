@@ -1,16 +1,20 @@
 import logging, os
 
+app_version = 'version 0.2 beta'
 log_format = '%(asctime)s -> %(levelname)s: %(message)s' # For example '2022-07-09 14:30:00,123 -> INFO: This is a test'
 date_format = '%Y-%m-%d %H:%M:%S'
 log_events = True
 logger = logging.getLogger("AiClient")
-if os.path.exists("version.txt"):
-    with open("version.txt", 'rt') as version_file:
-        version = version_file.read()
+if not app_version:
+    if os.path.exists("version.txt"):
+        with open("version.txt", 'rt') as version_file:
+            version = version_file.read()
+    else:
+        version = "Development-version"
+        with open("version.txt", 'rt') as version_file:
+            version_file.write(version)
 else:
-    version = "Development-version"
-    with open("version.txt", 'rt') as version_file:
-        version_file.write(version)
+    version = app_version
 if "Development-version" in version:
     log_level = logging.DEBUG
     log_events = True
