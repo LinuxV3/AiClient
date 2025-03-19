@@ -3,14 +3,13 @@
 A free unlimited multi interface (GUI, CLI) AI client for Linux and Windows which was developed with Python, PyQt5, g4f
 
 
-# Install using install script
+# Install
 #### Windows
 Installation on Windows is so easy!
 Just download the app last release in Release Section with `.msi` or `.exe` format and launch it then follow the steps to install the app
 #### Linux
 
-we just support Windows auto GUI installer and if you are using Linux you have to use installer script on CLI which is not recommended (anyway if you want to use CLI auto installer script read [here](https://github.com/)) and its better to install it from the source code on the GitHub using bellow commands
-
+we just support Windows auto GUI installer and if you are using Linux, its recommended to install from the source code
 
 ## Install from the source code
 
@@ -23,13 +22,13 @@ cd AiClient
 then you have to install the project requirements using `pip`
 
 ```bash
-pip install -r requirements.in
+pip install -r requirements.txt
 ```
 Now you can start using AI models by launching the App
 ```bash
 python3 main.py
 ```
-### Build using `pyinstaller`
+## Build using `pyinstaller`
 Also after you can build the project and make an executable file using `pyinstaller`
 
 First make sure you cloned the repository and you are in the cloned directory
@@ -51,7 +50,7 @@ source venv/bin/activate
 
 Install the requirements using `pip`
 ```bash
-pip install -r requirements.in
+pip install -r requirements.txt
 ```
 Now you can build the app using `pyinstaller`
 ```bash
