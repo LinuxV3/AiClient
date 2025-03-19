@@ -91,7 +91,7 @@ if install_packages:
 def request__(method: str, url: str, **kwargs) -> Any:
     # This function requests to a web url address
     log(f"Try send request to {url}", "debug")
-    response = request_api(method, url)
+    response = request_api(method, url, **kwargs)
     log(f"Request sent with {response.status_code} status code", "debug")
     return response
 
